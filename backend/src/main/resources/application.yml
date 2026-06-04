@@ -1,0 +1,34 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/smartqueue}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:change-this-secret-to-at-least-32-characters}
+    ttl-minutes: ${APP_JWT_TTL_MINUTES:720}
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173}
+  supabase:
+    url: ${SUPABASE_URL:}
+    anon-key: ${SUPABASE_ANON_KEY:}
+  admin-seed:
+    email: ${ADMIN_EMAIL:}
+    name: ${ADMIN_NAME:Admin}
+    password: ${ADMIN_PASSWORD:}
+  dev-auth:
+    enabled: ${DEV_AUTH_ENABLED:false}

@@ -1,0 +1,14 @@
+package com.smartqueue.domain;
+
+public enum QueueEventType {
+  TOKEN_CREATED,
+  TOKEN_CALLED,
+  TOKEN_SERVING,
+  TOKEN_SKIPPED,
+  TOKEN_RECALLED,
+  TOKEN_COMPLETED,
+  TOKEN_CANCELLED,
+  PRIORITY_UPDATED,
+  QUEUE_OPENED,
+  QUEUE_CLOSED
+}
