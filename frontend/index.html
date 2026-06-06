@@ -6,7 +6,46 @@
     <title>SmartQueue</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root">
+      <main style="font-family: system-ui, sans-serif; padding: 24px;">
+        <h1>Loading SmartQueue...</h1>
+        <p id="startup-status">Waiting for the React app bundle.</p>
+      </main>
+    </div>
+    <script>
+      window.showStartupFailure = function (message) {
+        var status = document.getElementById('startup-status');
+        if (status) {
+          status.textContent = message;
+        }
+      };
+
+      window.addEventListener('error', function (event) {
+        window.showStartupFailure('Frontend startup error: ' + (event.message || 'Unknown script error.'));
+      });
+
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        var message = reason && (reason.message || String(reason));
+        window.showStartupFailure('Frontend startup error: ' + (message || 'Unknown promise rejection.'));
+      });
+
+      window.setTimeout(function () {
+        if (!window.__SMARTQUEUE_REACT_STARTED__) {
+          var currentUrl = window.location.href;
+          var expectedUrl = 'http://localhost:5173/login';
+          var message = window.location.protocol === 'file:'
+            ? 'This file was opened directly. Start the frontend with npm run dev and open ' + expectedUrl + '.'
+            : 'React did not start from this page: ' + currentUrl + '. Start the frontend with npm run dev and open ' + expectedUrl + '.';
+          window.showStartupFailure(message);
+        }
+      }, 3000);
+    </script>
+    <script type="module">
+      import('/src/main.tsx').catch(function (error) {
+        var message = error && (error.message || String(error));
+        window.showStartupFailure('Frontend startup error: ' + (message || 'Unable to load /src/main.tsx'));
+      });
+    </script>
   </body>
 </html>

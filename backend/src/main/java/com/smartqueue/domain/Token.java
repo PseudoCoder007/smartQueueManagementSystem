@@ -3,6 +3,8 @@ package com.smartqueue.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "tokens")
@@ -27,10 +29,12 @@ public class Token {
   private QueueSession queueSession;
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(nullable = false, columnDefinition = "token_status")
   private TokenStatus status = TokenStatus.WAITING;
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(name = "priority_type", nullable = false, columnDefinition = "priority_type")
   private PriorityType priorityType = PriorityType.NORMAL;
 

@@ -3,6 +3,8 @@ package com.smartqueue.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "queue_events")
@@ -24,6 +26,7 @@ public class QueueEvent {
   private QueueSession queueSession;
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(name = "event_type", nullable = false, columnDefinition = "queue_event_type")
   private QueueEventType eventType;
 

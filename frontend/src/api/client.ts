@@ -6,6 +6,27 @@ export class ApiError extends Error {
   }
 }
 
+function messageFromBody(body: string, fallback: string) {
+  if (!body) {
+    return fallback;
+  }
+  try {
+    const parsed = JSON.parse(body) as { message?: unknown; error?: unknown; code?: unknown };
+    if (typeof parsed.message === 'string' && parsed.message.trim()) {
+      return parsed.message;
+    }
+    if (typeof parsed.error === 'string' && parsed.error.trim()) {
+      return parsed.error;
+    }
+    if (typeof parsed.code === 'string' && parsed.code.trim()) {
+      return parsed.code;
+    }
+  } catch {
+    // Non-JSON responses are still valid error payloads.
+  }
+  return body;
+}
+
 export async function api<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -16,8 +37,8 @@ export async function api<T>(path: string, options: RequestInit = {}, token?: st
     }
   });
   if (!response.ok) {
-    const message = await response.text();
-    throw new ApiError(response.status, message || response.statusText);
+    const body = await response.text();
+    throw new ApiError(response.status, messageFromBody(body, response.statusText));
   }
   if (response.status === 204) {
     return undefined as T;

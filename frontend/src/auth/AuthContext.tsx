@@ -15,7 +15,19 @@ const AuthContext = createContext<AuthState | null>(null);
 
 const stored = (): Session | null => {
   const raw = localStorage.getItem('smartqueue.session');
-  return raw ? JSON.parse(raw) as Session : null;
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Partial<Session>;
+    if (typeof parsed.token === 'string' && parsed.user?.id && parsed.user?.role) {
+      return parsed as Session;
+    }
+  } catch {
+    // Ignore old or malformed sessions so the app can render the login page.
+  }
+  localStorage.removeItem('smartqueue.session');
+  return null;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

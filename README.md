@@ -191,51 +191,82 @@ Install these before running the project:
 - npm
 - PostgreSQL, or a Supabase PostgreSQL project
 
+## Frontend Status
+
+The frontend is complete enough for the current MVP flow. It includes:
+
+- User Supabase Email OTP login and backend user sync.
+- Admin email/password login.
+- Protected user and admin routes.
+- User dashboard, service list, service detail, token creation, token tracking, and token history pages.
+- Admin dashboard, service management, queue control, and daily statistics pages.
+- WebSocket refresh for live queue and token updates.
+- Loading, empty, error, and basic reconnecting states.
+
+It still has a few polish items that can be improved later:
+
+- Admin service management can create and activate/deactivate services, but editing existing services is not exposed in the UI yet.
+- Priority updates currently use browser prompt dialogs instead of a polished form.
+- Notifications and success messages are basic.
+- Only a small frontend test set exists, so more page and API interaction tests would be useful.
+
 ## Backend Setup
 
-Go to the backend folder:
+Follow these steps to run the Spring Boot backend.
+
+### 1. Open the backend folder
 
 ```bash
 cd backend
 ```
 
-Set the environment variables needed by the backend.
+### 2. Create or update the backend env file
 
-For local development with PostgreSQL:
-
-```bash
-export DATABASE_URL=jdbc:postgresql://localhost:5432/smartqueue
-export DATABASE_USERNAME=postgres
-export DATABASE_PASSWORD=postgres
-export APP_JWT_SECRET=change-this-secret-to-at-least-32-characters
-export APP_CORS_ORIGINS=http://localhost:5173
-```
-
-To seed an admin account:
+The project includes `backend/.env.example`. Copy it to `backend/.env` if the `.env` file does not already exist:
 
 ```bash
-export ADMIN_EMAIL=admin@example.com
-export ADMIN_NAME=Admin
-export ADMIN_PASSWORD=admin12345
+cp .env.example .env
 ```
 
-For real Supabase user login:
+For Supabase IPv4 Shared Pooler, use these values in `backend/.env`:
 
-```bash
-export SUPABASE_URL=https://your-project.supabase.co
-export SUPABASE_ANON_KEY=your-supabase-anon-key
+```env
+DATABASE_URL=jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
+DATABASE_USERNAME=postgres.guyqvchogbkbcgsnghrw
+DATABASE_PASSWORD=YOUR_SUPABASE_DATABASE_PASSWORD
+APP_JWT_SECRET=change-this-secret-to-at-least-32-characters
+APP_JWT_TTL_MINUTES=720
+APP_CORS_ORIGINS=http://localhost:5173
+
+SUPABASE_URL=https://guyqvchogbkbcgsnghrw.supabase.co
+SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+
+ADMIN_EMAIL=admin@example.com
+ADMIN_NAME=Admin
+ADMIN_PASSWORD=admin12345
+
+DEV_AUTH_ENABLED=false
 ```
 
-For quick local testing without Supabase:
+Replace these placeholders before using real Supabase login:
 
-```bash
-export DEV_AUTH_ENABLED=true
-```
+- `YOUR_SUPABASE_DATABASE_PASSWORD`
+- `YOUR_SUPABASE_ANON_KEY`
 
-Run the backend:
+The backend automatically reads `backend/.env` when it starts.
+
+### 3. Run the backend
+
+If Maven is installed on your machine:
 
 ```bash
 mvn spring-boot:run
+```
+
+If your terminal shows `mvn: command not found`, use the local Maven and JDK bundled in this workspace:
+
+```bash
+PATH="$PWD/../.tools/apache-maven-3.9.9/bin:$PATH" JAVA_HOME="$PWD/../.tools/jdk-21.0.11+10/Contents/Home" mvn spring-boot:run
 ```
 
 The backend runs at:
@@ -250,38 +281,102 @@ Flyway automatically creates the database tables from:
 backend/src/main/resources/db/migration/V1__init.sql
 ```
 
+### 4. Run backend tests
+
+If Maven is installed on your machine:
+
+```bash
+mvn test
+```
+
+If your terminal shows `mvn: command not found`, use:
+
+```bash
+PATH="$PWD/../.tools/apache-maven-3.9.9/bin:$PATH" JAVA_HOME="$PWD/../.tools/jdk-21.0.11+10/Contents/Home" mvn test
+```
+
 ## Frontend Setup
 
-Go to the frontend folder:
+Follow these steps to run the React frontend.
+
+### 1. Open the frontend folder
+
+From the project root:
 
 ```bash
 cd frontend
 ```
 
-Install dependencies:
+### 2. Install frontend dependencies
+
+Run this once:
 
 ```bash
 npm install
 ```
 
-Create a `.env` file in the `frontend` folder:
+### 3. Create or update the frontend env file
+
+The project includes `frontend/.env.example`. Copy it to `frontend/.env` if the `.env` file does not already exist:
+
+```bash
+cp .env.example .env
+```
+
+Use these values in `frontend/.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080/api
 VITE_WS_BASE_URL=http://localhost:8080/ws
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_SUPABASE_URL=https://guyqvchogbkbcgsnghrw.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-If you are using backend development auth only, the Supabase values can stay as placeholder values for early local API testing.
+Replace `YOUR_SUPABASE_ANON_KEY` with your Supabase anon key.
 
-Run the frontend:
+### 4. Run the frontend
 
 ```bash
 npm run dev
 ```
 
 The frontend usually runs at:
+
+```text
+http://localhost:5173
+```
+
+### 5. Run frontend tests
+
+```bash
+npm test
+```
+
+### 6. Run a frontend production build check
+
+```bash
+npm run build
+```
+
+## Quick Start
+
+Use two terminals.
+
+Terminal 1:
+
+```bash
+cd backend
+PATH="$PWD/../.tools/apache-maven-3.9.9/bin:$PATH" JAVA_HOME="$PWD/../.tools/jdk-21.0.11+10/Contents/Home" mvn spring-boot:run
+```
+
+Terminal 2:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Then open:
 
 ```text
 http://localhost:5173
@@ -388,7 +483,7 @@ From the backend folder:
 
 ```bash
 cd backend
-mvn test
+PATH="$PWD/../.tools/apache-maven-3.9.9/bin:$PATH" JAVA_HOME="$PWD/../.tools/jdk-21.0.11+10/Contents/Home" mvn test
 ```
 
 The backend test setup includes H2 for tests and checks queue priority ordering.

@@ -3,6 +3,8 @@ package com.smartqueue.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "queue_sessions")
@@ -16,6 +18,7 @@ public class QueueSession {
   private ServiceQueue service;
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(nullable = false, columnDefinition = "queue_session_status")
   private QueueSessionStatus status = QueueSessionStatus.OPEN;
 

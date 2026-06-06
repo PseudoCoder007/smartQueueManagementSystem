@@ -29,10 +29,10 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
       @Param("end") java.time.Instant end);
 
   @Query("""
-      select coalesce(avg(t.estimatedWaitMinutes), 0)
+      select avg(t.estimatedWaitMinutes)
       from Token t
       where t.status = com.smartqueue.domain.TokenStatus.COMPLETED
       and t.estimatedWaitMinutes is not null
       """)
-  double averageWaitMinutes();
+  Double averageWaitMinutes();
 }

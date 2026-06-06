@@ -38,6 +38,7 @@ export function AppRoutes() {
           <Route path="/admin/stats" element={<AdminStatsPage />} />
         </Route>
       </Route>
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

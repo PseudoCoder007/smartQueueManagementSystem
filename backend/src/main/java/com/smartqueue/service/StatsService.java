@@ -28,9 +28,10 @@ public class StatsService {
     long activeQueues = services.findAll().stream()
         .filter(service -> sessions.existsByServiceIdAndStatus(service.getId(), QueueSessionStatus.OPEN))
         .count();
+    Double averageWaitMinutes = tokens.averageWaitMinutes();
     return new StatsDtos.OverviewStats(tokens.count(), activeQueues, tokens.countByStatus(TokenStatus.COMPLETED),
         tokens.countByStatus(TokenStatus.SKIPPED), tokens.countByStatus(TokenStatus.CANCELLED),
-        tokens.averageWaitMinutes());
+        averageWaitMinutes == null ? 0 : averageWaitMinutes);
   }
 
   public StatsDtos.ServiceStats service(UUID serviceId) {

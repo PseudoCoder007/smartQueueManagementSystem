@@ -3,6 +3,8 @@ package com.smartqueue.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "services")
@@ -20,6 +22,7 @@ public class ServiceQueue {
   private Integer averageServiceMinutes = 5;
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(nullable = false, columnDefinition = "service_status")
   private ServiceStatus status = ServiceStatus.ACTIVE;
 
