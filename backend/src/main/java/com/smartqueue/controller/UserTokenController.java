@@ -6,6 +6,7 @@ import com.smartqueue.service.TokenService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,13 @@ public class UserTokenController {
   @GetMapping("/my")
   public List<TokenDtos.TokenResponse> mine() {
     return tokens.myTokens(currentUser.requireUser());
+  }
+
+  @GetMapping("/active")
+  public ResponseEntity<TokenDtos.TokenResponse> active(@RequestParam UUID serviceId) {
+    return tokens.activeForService(serviceId, currentUser.requireUser())
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.noContent().build());
   }
 
   @GetMapping("/{tokenId}")

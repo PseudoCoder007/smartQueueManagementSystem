@@ -8,7 +8,9 @@ export const userApi = {
     api<Token>('/tokens', { method: 'POST', ...jsonBody({ serviceId, priorityType }) }, token),
   myTokens: (token: string) => api<Token[]>('/tokens/my', {}, token),
   token: (id: string, token: string) => api<Token>(`/tokens/${id}`, {}, token),
-  cancel: (id: string, token: string) => api<Token>(`/tokens/${id}/cancel`, { method: 'DELETE' }, token)
+  cancel: (id: string, token: string) => api<Token>(`/tokens/${id}/cancel`, { method: 'DELETE' }, token),
+  activeToken: (serviceId: string, token: string) =>
+    api<Token | undefined>(`/tokens/active?serviceId=${serviceId}`, {}, token)
 };
 
 export const adminApi = {

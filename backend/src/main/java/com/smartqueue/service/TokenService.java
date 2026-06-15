@@ -2,6 +2,7 @@ package com.smartqueue.service;
 
 import com.smartqueue.domain.*;
 import com.smartqueue.dto.TokenDtos;
+import java.util.Optional;
 import com.smartqueue.repository.QueueSessionRepository;
 import com.smartqueue.repository.TokenRepository;
 import com.smartqueue.websocket.QueueEventPublisher;
@@ -58,10 +59,19 @@ public class TokenService {
     return response;
   }
 
+  @Transactional(readOnly = true)
   public List<TokenDtos.TokenResponse> myTokens(AppUser user) {
     return tokens.findByUserIdOrderByCreatedAtDesc(user.getId()).stream().map(mapper::token).toList();
   }
 
+  @Transactional(readOnly = true)
+  public Optional<TokenDtos.TokenResponse> activeForService(UUID serviceId, AppUser user) {
+    return tokens.findFirstByUserIdAndServiceIdAndQueueSessionStatusAndStatusIn(
+        user.getId(), serviceId, QueueSessionStatus.OPEN, ACTIVE)
+        .map(mapper::token);
+  }
+
+  @Transactional(readOnly = true)
   public TokenDtos.TokenResponse detail(UUID tokenId, AppUser user) {
     Token token = require(tokenId);
     if (user.getRole() != UserRole.ADMIN && !token.getUser().getId().equals(user.getId())) {

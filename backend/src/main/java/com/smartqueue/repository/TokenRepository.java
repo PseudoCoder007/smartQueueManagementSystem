@@ -1,5 +1,6 @@
 package com.smartqueue.repository;
 
+import com.smartqueue.domain.QueueSessionStatus;
 import com.smartqueue.domain.Token;
 import com.smartqueue.domain.TokenStatus;
 import java.util.Collection;
@@ -17,6 +18,8 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
   List<Token> findByQueueSessionIdAndStatusInOrderByCreatedAtAsc(UUID queueSessionId, Collection<TokenStatus> statuses);
   Optional<Token> findFirstByQueueSessionIdOrderByTokenNumberDesc(UUID queueSessionId);
   boolean existsByUserIdAndQueueSessionIdAndStatusIn(UUID userId, UUID queueSessionId, Collection<TokenStatus> statuses);
+  Optional<Token> findFirstByUserIdAndServiceIdAndQueueSessionStatusAndStatusIn(
+      UUID userId, UUID serviceId, QueueSessionStatus queueSessionStatus, Collection<TokenStatus> statuses);
   long countByQueueSessionIdAndStatus(UUID queueSessionId, TokenStatus status);
   long countByServiceId(UUID serviceId);
   long countByStatus(TokenStatus status);
@@ -31,8 +34,8 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
   @Query("""
       select avg(t.estimatedWaitMinutes)
       from Token t
-      where t.status = com.smartqueue.domain.TokenStatus.COMPLETED
+      where t.status = :status
       and t.estimatedWaitMinutes is not null
       """)
-  Double averageWaitMinutes();
+  Double averageWaitMinutes(@Param("status") TokenStatus status);
 }
