@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketch 001 — Design System | SmartQueue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../themes/enterprise.css">
+<style>
+  /* ── Sketch toolbar ── */
+  #sketch-toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #1e1e2e; color: #cdd6f4; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; padding: 8px 16px;
+    display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #313244;
+  }
+  #sketch-toolbar .label { color: #6c7086; }
+  .variant-tab {
+    background: transparent; border: 1px solid #45475a; color: #cdd6f4;
+    border-radius: 5px; padding: 4px 12px; cursor: pointer; font-family: inherit;
+    font-size: 12px; transition: all 120ms ease;
+  }
+  .variant-tab:hover { background: #313244; }
+  .variant-tab.active { background: #89b4fa; color: #1e1e2e; border-color: #89b4fa; font-weight: 600; }
+  .variant-tab.winner::after { content: ' ★'; }
+  #sketch-toolbar select {
+    background: #313244; border: 1px solid #45475a; color: #cdd6f4;
+    border-radius: 5px; padding: 4px 8px; font-family: inherit; font-size: 12px;
+  }
+  .spacer { flex: 1; }
+
+  /* ── Base reset ── */
+  body { margin: 0; padding-top: 48px; }
+  .variant { display: none; }
+  .variant.active { display: block; }
+
+  /* ── Shared showcase styles ── */
+  .showcase { min-height: 100vh; padding: 40px; }
+  .showcase-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; margin: 0 0 8px; opacity: 0.5;
+  }
+  .section { margin-bottom: 48px; }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid; opacity: 0.4;
+  }
+  .row-wrap { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .col-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .col-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .col-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+
+  /* ── Sidebar preview ── */
+  .sidebar-preview {
+    width: 220px; border-radius: 12px; overflow: hidden; flex-shrink: 0;
+  }
+  .sidebar-preview-inner { padding: 16px; }
+  .app-preview { display: flex; gap: 0; border-radius: 12px; overflow: hidden; height: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .app-preview-content { flex: 1; padding: 24px; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<!-- Sketch Toolbar -->
+<div id="sketch-toolbar">
+  <span class="label">Sketch 001</span>
+  <span style="color:#89b4fa">Design System</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Linear (Neutral Enterprise)</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Stripe (Clean Light)</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Vercel (Deep Professional)</button>
+  <div class="spacer"></div>
+  <span class="label">Theme:</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="enterprise">Enterprise</option>
+  </select>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VARIANT A — NEUTRAL ENTERPRISE (Linear-inspired)
+     Dark navy sidebar, slate surfaces, blue accent
+════════════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+<style>
+  /* Variant A: Linear palette */
+  .va { --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9; --border: #e2e8f0;
+    --text: #0f172a; --muted: #64748b; --subtle: #94a3b8;
+    --primary: #2563eb; --primary-h: #1d4ed8; --primary-l: #eff6ff;
+    --sidebar: #0f172a; --sb-text: #94a3b8; --sb-active: #f8fafc; --sb-hover: rgba(255,255,255,0.06);
+    --success: #16a34a; --warning: #d97706; --danger: #dc2626;
+    --radius: 8px; --font: 'Inter', sans-serif; --mono: 'JetBrains Mono', monospace;
+  }
+</style>
+<div class="va showcase" style="background:var(--bg); font-family:var(--font); color:var(--text);">
+
+  <!-- Header -->
+  <div style="max-width:900px; margin:0 auto;">
+    <div class="showcase-title" style="color:var(--muted)">Variant A</div>
+    <h1 style="font-size:28px;font-weight:700;margin:0 0 4px;letter-spacing:-0.5px">Neutral Enterprise</h1>
+    <p style="color:var(--muted);margin:0 0 40px;font-size:14px">Inspired by Linear — dark sidebar, slate palette, precision typography</p>
+
+    <!-- COLORS -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Color Palette</div>
+      <div class="col-4">
+        <div>
+          <div style="height:56px;border-radius:8px;background:var(--sidebar);margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div>
+          <div style="font-size:12px;font-weight:600">Sidebar</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#0f172a</div>
+        </div>
+        <div>
+          <div style="height:56px;border-radius:8px;background:var(--primary);margin-bottom:8px"></div>
+          <div style="font-size:12px;font-weight:600">Primary</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#2563eb</div>
+        </div>
+        <div>
+          <div style="height:56px;border-radius:8px;background:var(--surface);border:1px solid var(--border);margin-bottom:8px"></div>
+          <div style="font-size:12px;font-weight:600">Surface</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#ffffff</div>
+        </div>
+        <div>
+          <div style="height:56px;border-radius:8px;background:var(--bg);border:1px solid var(--border);margin-bottom:8px"></div>
+          <div style="font-size:12px;font-weight:600">Background</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#f8fafc</div>
+        </div>
+      </div>
+      <div class="col-4" style="margin-top:12px">
+        <div><div style="height:40px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;margin-bottom:6px"></div><div style="font-size:11px;color:#16a34a;font-weight:600">Success</div></div>
+        <div><div style="height:40px;border-radius:6px;background:#fffbeb;border:1px solid #fde68a;margin-bottom:6px"></div><div style="font-size:11px;color:#d97706;font-weight:600">Warning</div></div>
+        <div><div style="height:40px;border-radius:6px;background:#fef2f2;border:1px solid #fecaca;margin-bottom:6px"></div><div style="font-size:11px;color:#dc2626;font-weight:600">Danger</div></div>
+        <div><div style="height:40px;border-radius:6px;background:#f0f9ff;border:1px solid #bae6fd;margin-bottom:6px"></div><div style="font-size:11px;color:#0284c7;font-weight:600">Info</div></div>
+      </div>
+    </div>
+
+    <!-- TYPOGRAPHY -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Typography</div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:32px;font-weight:700;letter-spacing:-0.75px;line-height:1.1">Queue Management Dashboard</div>
+        <div style="font-size:20px;font-weight:600;letter-spacing:-0.3px">Service Overview — Heading 2</div>
+        <div style="font-size:15px;font-weight:500">Subtitle — 15px Medium</div>
+        <div style="font-size:14px;color:var(--muted)">Body text — Regular weight, slate-600. Clear and comfortable for dense data views used throughout the admin interface.</div>
+        <div style="font-size:12px;color:var(--subtle)">Caption / label text — 12px Regular</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--primary);background:var(--primary-l);padding:4px 8px;border-radius:4px;display:inline-block">#142 · SERVING · 0 min</div>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Buttons</div>
+      <div class="row-wrap">
+        <button style="background:var(--primary);color:#fff;border:none;border-radius:7px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Primary Action
+        </button>
+        <button style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Secondary</button>
+        <button style="background:transparent;color:var(--primary);border:none;border-radius:7px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Ghost</button>
+        <button style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Destructive</button>
+        <button style="background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;opacity:0.5" disabled>Disabled</button>
+        <button style="background:var(--primary);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer">SM</button>
+        <button style="background:var(--primary);color:#fff;border:none;border-radius:9px;padding:12px 24px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer">Large</button>
+        <button style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:9px;font-family:var(--font);cursor:pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- BADGES -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Status Badges</div>
+      <div class="row-wrap">
+        <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #fde68a">WAITING</span>
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #6ee7b7">SERVING</span>
+        <span style="background:#dbeafe;color:#1e40af;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #93c5fd">CALLED</span>
+        <span style="background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #c4b5fd">COMPLETED</span>
+        <span style="background:#fff7ed;color:#9a3412;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #fdba74">SKIPPED</span>
+        <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #cbd5e1">CANCELLED</span>
+        <span style="background:#fef2f2;color:#991b1b;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #fca5a5">EMERGENCY</span>
+        <span style="background:#fdf4ff;color:#7e22ce;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #e9d5ff">VIP</span>
+        <span style="background:#ecfdf5;color:#064e3b;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid #6ee7b7">● LIVE</span>
+        <span style="background:var(--surface);color:var(--muted);font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid var(--border)">INACTIVE</span>
+      </div>
+    </div>
+
+    <!-- FORMS -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Form Inputs</div>
+      <div class="col-3">
+        <div>
+          <label style="font-size:13px;font-weight:500;color:var(--text);display:block;margin-bottom:6px">Service Name</label>
+          <input placeholder="e.g. General Consultation" style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none" onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)'" onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:500;color:var(--text);display:block;margin-bottom:6px">Priority Type</label>
+          <select style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);appearance:none;outline:none">
+            <option>NORMAL</option><option>SENIOR_CITIZEN</option><option>VIP</option><option>EMERGENCY</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:500;color:var(--text);display:block;margin-bottom:6px">Avg Service (min)</label>
+          <input type="number" value="5" style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none">
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px;background:#fef2f2;border-radius:7px;border:1px solid #fecaca;font-size:13px;color:#dc2626;display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Validation error state — Service name is required
+      </div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Cards & Panels</div>
+      <div class="col-3">
+        <!-- Stat card -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Total Tokens</div>
+          <div style="font-size:32px;font-weight:700;letter-spacing:-1px;font-family:var(--mono);color:var(--text)">2,847</div>
+          <div style="font-size:12px;color:#16a34a;margin-top:6px;display:flex;align-items:center;gap:4px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+            +12% from yesterday
+          </div>
+        </div>
+        <!-- Service card -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="font-size:14px;font-weight:600">General OPD</div>
+            <span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid #6ee7b7">● OPEN</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:14px">General outpatient consultation</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="font-size:11px;color:var(--muted)">Waiting<br><strong style="color:var(--text);font-size:18px;font-family:var(--mono)">24</strong></div>
+            <div style="font-size:11px;color:var(--muted)">Est. Wait<br><strong style="color:var(--text);font-size:18px;font-family:var(--mono)">48m</strong></div>
+          </div>
+        </div>
+        <!-- Token card -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--text)">#142</div>
+            <span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid #fde68a">WAITING</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">General OPD</div>
+          <div style="font-size:12px;color:var(--muted)">Position: <strong style="color:var(--text)">3</strong> · Est. <strong style="color:var(--text)">12 min</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP SHELL PREVIEW -->
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">App Shell & Sidebar</div>
+      <div class="app-preview">
+        <div class="sidebar-preview" style="background:var(--sidebar);padding:0;width:220px;flex-shrink:0">
+          <div style="padding:20px 16px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px">
+              <div style="width:28px;height:28px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              </div>
+              <span style="color:#f8fafc;font-size:14px;font-weight:600;font-family:var(--font)">SmartQueue</span>
+            </div>
+            <nav style="display:flex;flex-direction:column;gap:2px">
+              <a href="#" style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;color:#f8fafc;font-size:13px;font-weight:500;background:rgba(255,255,255,0.10);text-decoration:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+              </a>
+              <a href="#" style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;color:#94a3b8;font-size:13px;font-weight:500;text-decoration:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Services
+              </a>
+              <a href="#" style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;color:#94a3b8;font-size:13px;font-weight:500;text-decoration:none">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Statistics
+              </a>
+            </nav>
+          </div>
+          <div style="position:absolute;bottom:0;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);width:188px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:28px;height:28px;border-radius:999px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8;font-weight:600">AD</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:500;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Admin</div>
+                <div style="font-size:11px;color:#64748b">admin@hospital.com</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-preview-content" style="background:var(--bg)">
+          <h2 style="font-size:18px;font-weight:600;margin:0 0 16px;color:var(--text)">Dashboard</h2>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;font-weight:600">Active Queues</div>
+              <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--text)">6</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;font-weight:600">Waiting</div>
+              <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--text)">143</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VARIANT B — CLEAN LIGHT (Stripe-inspired)
+     Pure white, blue accent, generous whitespace
+════════════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+<style>
+  .vb { --bg: #ffffff; --surface: #f6f9fc; --surface-2: #f0f4f8; --border: #dde3ea;
+    --text: #1a1f36; --muted: #697386; --subtle: #a3acb9;
+    --primary: #5469d4; --primary-h: #3d57cc; --primary-l: #eef0fc;
+    --sidebar: #ffffff; --sb-text: #697386; --sb-active: #1a1f36; --sb-hover: #f6f9fc;
+    --success: #09825d; --warning: #c44c00; --danger: #cd3d64;
+    --radius: 6px; --font: 'Inter', sans-serif; --mono: 'JetBrains Mono', monospace;
+  }
+</style>
+<div class="vb showcase" style="background:var(--bg);font-family:var(--font);color:var(--text);">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="showcase-title" style="color:var(--muted)">Variant B</div>
+    <h1 style="font-size:28px;font-weight:700;margin:0 0 4px;letter-spacing:-0.4px">Clean Light</h1>
+    <p style="color:var(--muted);margin:0 0 40px;font-size:14px">Inspired by Stripe — clean white, indigo accent, meticulous spacing</p>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Color Palette</div>
+      <div class="col-4">
+        <div><div style="height:56px;border-radius:6px;background:#1a1f36;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Ink</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#1a1f36</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#5469d4;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Indigo</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#5469d4</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#f6f9fc;border:1px solid #dde3ea;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Surface</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#f6f9fc</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#ffffff;border:1px solid #dde3ea;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">White</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#ffffff</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Buttons</div>
+      <div class="row-wrap">
+        <button style="background:#5469d4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;letter-spacing:0.01em">Create Token</button>
+        <button style="background:#fff;color:#1a1f36;border:1px solid #dde3ea;border-radius:6px;padding:10px 18px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06)">Secondary</button>
+        <button style="background:#fff;color:#cd3d64;border:1px solid #fcd9e2;border-radius:6px;padding:10px 18px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Cancel Token</button>
+        <button style="background:#fff;color:#697386;border:1px solid #dde3ea;border-radius:6px;padding:10px;cursor:pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#697386" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">Stat Cards</div>
+      <div class="col-4">
+        <div style="background:#fff;border:1px solid #dde3ea;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:12px;color:#697386;margin-bottom:10px;font-weight:500">Total Tokens</div>
+          <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:#1a1f36;letter-spacing:-1px">2,847</div>
+          <div style="font-size:12px;color:#09825d;margin-top:8px">↑ 12% today</div>
+        </div>
+        <div style="background:#fff;border:1px solid #dde3ea;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:12px;color:#697386;margin-bottom:10px;font-weight:500">Active Queues</div>
+          <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:#1a1f36;letter-spacing:-1px">6</div>
+          <div style="font-size:12px;color:#697386;margin-top:8px">4 hospitals, 2 clinics</div>
+        </div>
+        <div style="background:#fff;border:1px solid #dde3ea;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:12px;color:#697386;margin-bottom:10px;font-weight:500">Waiting Now</div>
+          <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:#1a1f36;letter-spacing:-1px">143</div>
+          <div style="font-size:12px;color:#c44c00;margin-top:8px">↑ 23 since 9am</div>
+        </div>
+        <div style="background:#fff;border:1px solid #dde3ea;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:12px;color:#697386;margin-bottom:10px;font-weight:500">Avg Wait</div>
+          <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:#1a1f36;letter-spacing:-1px">18m</div>
+          <div style="font-size:12px;color:#09825d;margin-top:8px">↓ 4min vs target</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--muted);border-color:var(--border)">App Shell (Light Sidebar)</div>
+      <div class="app-preview" style="border:1px solid #dde3ea;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+        <div style="width:200px;background:#fff;border-right:1px solid #dde3ea;padding:20px 12px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px;padding:0 4px">
+            <div style="width:24px;height:24px;background:#5469d4;border-radius:5px"></div>
+            <span style="font-size:14px;font-weight:700;color:#1a1f36">SmartQueue</span>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:#a3acb9;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;padding:0 8px">Main</div>
+          <nav style="display:flex;flex-direction:column;gap:1px">
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;color:#1a1f36;font-size:13px;font-weight:500;background:#eef0fc;text-decoration:none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#5469d4" stroke="#5469d4" stroke-width="0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+              <span style="color:#5469d4">Dashboard</span>
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;color:#697386;font-size:13px;text-decoration:none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              Services
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;color:#697386;font-size:13px;text-decoration:none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Analytics
+            </a>
+          </nav>
+        </div>
+        <div style="flex:1;background:#f6f9fc;padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <h2 style="font-size:16px;font-weight:600;margin:0;color:#1a1f36">Dashboard</h2>
+            <button style="background:#5469d4;color:#fff;border:none;border-radius:5px;padding:6px 12px;font-size:13px;cursor:pointer">+ New Service</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:14px">
+              <div style="font-size:10px;color:#697386;margin-bottom:6px;font-weight:600;text-transform:uppercase">Queues Open</div>
+              <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:#1a1f36">6 / 8</div>
+            </div>
+            <div style="background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:14px">
+              <div style="font-size:10px;color:#697386;margin-bottom:6px;font-weight:600;text-transform:uppercase">Waiting</div>
+              <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:#1a1f36">143</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VARIANT C — DEEP PROFESSIONAL (Vercel-inspired)
+     Near-black, emerald accent, monospace data
+════════════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+<style>
+  .vc { --bg: #09090b; --surface: #111113; --surface-2: #18181b; --border: #27272a;
+    --text: #fafafa; --muted: #a1a1aa; --subtle: #52525b;
+    --primary: #10b981; --primary-h: #059669; --primary-l: #052e16;
+    --sidebar: #09090b; --sb-text: #71717a; --sb-active: #fafafa; --sb-hover: rgba(255,255,255,0.04);
+    --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    --radius: 6px; --font: 'Inter', sans-serif; --mono: 'JetBrains Mono', monospace;
+  }
+</style>
+<div class="vc showcase" style="background:var(--bg);font-family:var(--font);color:var(--text);">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="showcase-title" style="color:var(--muted)">Variant C</div>
+    <h1 style="font-size:28px;font-weight:700;margin:0 0 4px;letter-spacing:-0.5px">Deep Professional</h1>
+    <p style="color:var(--muted);margin:0 0 40px;font-size:14px">Inspired by Vercel — near-black, emerald accent, monospace precision</p>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--subtle);border-color:var(--border)">Color Palette</div>
+      <div class="col-4">
+        <div><div style="height:56px;border-radius:6px;background:#09090b;border:1px solid #27272a;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Canvas</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#09090b</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#10b981;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Emerald</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#10b981</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#111113;border:1px solid #27272a;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Surface</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#111113</div></div>
+        <div><div style="height:56px;border-radius:6px;background:#18181b;border:1px solid #27272a;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">Raised</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#18181b</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--subtle);border-color:var(--border)">Buttons</div>
+      <div class="row-wrap">
+        <button style="background:#fafafa;color:#09090b;border:none;border-radius:6px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Primary</button>
+        <button style="background:transparent;color:#fafafa;border:1px solid #27272a;border-radius:6px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Secondary</button>
+        <button style="background:#10b981;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Call Next ›</button>
+        <button style="background:transparent;color:#ef4444;border:1px solid #27272a;border-radius:6px;padding:9px 16px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--subtle);border-color:var(--border)">Stat Cards — Terminal Style</div>
+      <div class="col-4">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">TOTAL_TOKENS</div>
+          <div style="font-size:32px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:-1px">2847</div>
+          <div style="font-size:11px;color:#10b981;margin-top:8px;font-family:var(--mono)">+12% ↑</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">ACTIVE_QUEUES</div>
+          <div style="font-size:32px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:-1px">6</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;font-family:var(--mono)">of 8 total</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">WAITING_NOW</div>
+          <div style="font-size:32px;font-weight:700;font-family:var(--mono);color:#f59e0b;letter-spacing:-1px">143</div>
+          <div style="font-size:11px;color:#f59e0b;margin-top:8px;font-family:var(--mono)">peak load</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">AVG_WAIT_MIN</div>
+          <div style="font-size:32px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:-1px">18</div>
+          <div style="font-size:11px;color:#10b981;margin-top:8px;font-family:var(--mono)">-4 from target</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label" style="color:var(--subtle);border-color:var(--border)">App Shell (Full Dark)</div>
+      <div class="app-preview" style="border:1px solid #27272a">
+        <div style="width:200px;background:#09090b;border-right:1px solid #27272a;padding:16px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px">
+            <div style="width:24px;height:24px;background:#10b981;border-radius:4px"></div>
+            <span style="font-size:13px;font-weight:600;color:#fafafa;font-family:var(--font)">SmartQueue</span>
+          </div>
+          <nav style="display:flex;flex-direction:column;gap:1px">
+            <a href="#" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:5px;color:#fafafa;font-size:12px;font-weight:500;background:rgba(255,255,255,0.06);text-decoration:none;font-family:var(--mono)">/ dashboard</a>
+            <a href="#" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:5px;color:#71717a;font-size:12px;text-decoration:none;font-family:var(--mono)">/ services</a>
+            <a href="#" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:5px;color:#71717a;font-size:12px;text-decoration:none;font-family:var(--mono)">/ stats</a>
+          </nav>
+        </div>
+        <div style="flex:1;background:#09090b;padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;border-bottom:1px solid #18181b;padding-bottom:16px">
+            <span style="font-family:var(--mono);font-size:13px;color:#fafafa">~ dashboard</span>
+            <span style="font-size:11px;color:#10b981;font-family:var(--mono)">● live</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:#111113;border:1px solid #27272a;border-radius:6px;padding:12px">
+              <div style="font-size:10px;color:#52525b;font-family:var(--mono);margin-bottom:4px">QUEUES</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:#fafafa">6</div>
+            </div>
+            <div style="background:#111113;border:1px solid #27272a;border-radius:6px;padding:12px">
+              <div style="font-size:10px;color:#52525b;font-family:var(--mono);margin-bottom:4px">WAITING</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:#f59e0b">143</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>

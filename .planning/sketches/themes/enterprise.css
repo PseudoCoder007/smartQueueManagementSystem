@@ -1,0 +1,103 @@
+/* SmartQueue Enterprise Design System — Default Theme (Linear-inspired) */
+:root {
+  /* === COLORS === */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff6ff;
+
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
+  --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
+  --color-info: #0284c7;
+  --color-info-light: #f0f9ff;
+
+  /* Sidebar */
+  --color-sidebar-bg: #0f172a;
+  --color-sidebar-border: rgba(255,255,255,0.06);
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-text-active: #f8fafc;
+  --color-sidebar-hover-bg: rgba(255,255,255,0.06);
+  --color-sidebar-active-bg: rgba(255,255,255,0.10);
+
+  /* Status token colors */
+  --color-waiting: #f59e0b;
+  --color-waiting-bg: #fef3c7;
+  --color-serving: #10b981;
+  --color-serving-bg: #d1fae5;
+  --color-completed: #6366f1;
+  --color-completed-bg: #eef2ff;
+  --color-cancelled: #94a3b8;
+  --color-cancelled-bg: #f1f5f9;
+  --color-skipped: #f97316;
+  --color-skipped-bg: #fff7ed;
+
+  /* === TYPOGRAPHY === */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-lg: 1.0625rem;   /* 17px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* === SPACING === */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* === SHAPES === */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md: 0 4px 6px rgba(15,23,42,0.05), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-lg: 0 10px 24px rgba(15,23,42,0.08), 0 4px 8px rgba(15,23,42,0.04);
+  --shadow-xl: 0 20px 40px rgba(15,23,42,0.12), 0 8px 16px rgba(15,23,42,0.06);
+
+  /* === TRANSITIONS === */
+  --transition-fast: 100ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 250ms ease;
+}

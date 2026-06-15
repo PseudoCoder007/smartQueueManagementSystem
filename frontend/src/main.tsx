@@ -17,7 +17,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <AppRoutes />
         </AuthProvider>
       </BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: { background: '#18181b', color: '#fafafa', border: '1px solid rgba(255,255,255,0.1)', fontSize: 13 },
+          success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        }}
+      />
     </ErrorBoundary>
   </React.StrictMode>
 );

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketch 004 — Queue Management | SmartQueue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../themes/enterprise.css">
+<style>
+  * { box-sizing:border-box;margin:0;padding:0; }
+  #sketch-toolbar {
+    position:fixed;top:0;left:0;right:0;z-index:9999;
+    background:#1e1e2e;color:#cdd6f4;font-family:'JetBrains Mono',monospace;
+    font-size:12px;padding:8px 16px;display:flex;align-items:center;gap:16px;
+    border-bottom:1px solid #313244;
+  }
+  .variant-tab {
+    background:transparent;border:1px solid #45475a;color:#cdd6f4;
+    border-radius:5px;padding:4px 12px;cursor:pointer;font-family:inherit;
+    font-size:12px;transition:all 120ms;
+  }
+  .variant-tab.active { background:#89b4fa;color:#1e1e2e;border-color:#89b4fa;font-weight:600; }
+  .spacer { flex:1; }
+  body { margin:0;padding-top:40px;font-family:'Inter',sans-serif; }
+  .variant { display:none; }
+  .variant.active { display:block; }
+
+  /* Token card component */
+  .token-card {
+    background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;
+    transition:box-shadow 140ms;cursor:pointer;
+  }
+  .token-card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+  .token-num { font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a; }
+  .token-meta { font-size:11px;color:#64748b;margin-top:2px; }
+  .p-emergency { border-left:3px solid #dc2626; }
+  .p-vip { border-left:3px solid #7c3aed; }
+  .p-senior { border-left:3px solid #0891b2; }
+  .p-normal { border-left:3px solid #e2e8f0; }
+  .p-badge-emergency { background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px; }
+  .p-badge-vip { background:#f5f3ff;color:#6d28d9;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px; }
+  .p-badge-senior { background:#ecfeff;color:#0e7490;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px; }
+  .p-badge-normal { background:#f1f5f9;color:#475569;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px; }
+
+  .col-header {
+    font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;
+    letter-spacing:0.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px;
+  }
+  .badge-count {
+    background:#e2e8f0;color:#475569;border-radius:20px;font-size:10px;
+    font-weight:700;padding:1px 8px;font-family:'JetBrains Mono',monospace;
+  }
+  .live-dot { width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  .btn-call {
+    background:#2563eb;color:#fff;border:none;border-radius:8px;
+    padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;
+    font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;
+    transition:background 140ms;width:100%;justify-content:center;
+  }
+  .btn-call:hover { background:#1d4ed8; }
+  .btn-complete { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px; }
+  .btn-skip { background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px; }
+  .btn-cancel { background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px; }
+</style>
+</head>
+<body>
+
+<div id="sketch-toolbar">
+  <span style="color:#6c7086">Sketch 004</span>
+  <span style="color:#89b4fa">Queue Management</span>
+  <button class="variant-tab active" onclick="showVariant('a',this)">A: Three Columns</button>
+  <button class="variant-tab" onclick="showVariant('b',this)">B: Focus View</button>
+  <button class="variant-tab" onclick="showVariant('c',this)">C: Command Bar</button>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT A — THREE COLUMNS (Kanban)
+     Waiting | Serving | Done columns side-by-side
+══════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+<div style="min-height:calc(100vh - 40px);background:#f8fafc;display:flex;flex-direction:column;">
+  <!-- Top action bar -->
+  <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;align-items:center;gap:16px;">
+    <div>
+      <div style="font-size:15px;font-weight:600;color:#0f172a">General OPD</div>
+      <div style="font-size:11px;color:#64748b">Queue Management</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;background:#dcfce7;color:#16a34a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;">
+      <div class="live-dot"></div> OPEN
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <select style="background:#fff;border:1px solid #e2e8f0;border-radius:7px;padding:7px 12px;font-family:'Inter',sans-serif;font-size:13px;color:#0f172a">
+        <option>All priorities</option><option>EMERGENCY</option><option>VIP</option>
+      </select>
+      <button style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;">Close Queue</button>
+      <button class="btn-call" style="width:auto;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Call Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Three columns -->
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:20px 24px;overflow:hidden;">
+
+    <!-- WAITING column -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;">
+      <div class="col-header">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Waiting <span class="badge-count" style="background:#fef3c7;color:#92400e;">34</span>
+      </div>
+      <div style="overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px;">
+        <div class="token-card p-emergency">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="token-num">#G-047</div>
+            <span class="p-badge-emergency">EMERGENCY</span>
+          </div>
+          <div class="token-meta">Joined 10:38 AM · 4m ago · Position #1</div>
+          <div style="margin-top:8px;font-size:11px;color:#64748b">Ravi Kumar</div>
+        </div>
+        <div class="token-card p-vip">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="token-num">#G-048</div>
+            <span class="p-badge-vip">VIP</span>
+          </div>
+          <div class="token-meta">Joined 10:39 AM · 3m ago · Position #2</div>
+        </div>
+        <div class="token-card p-senior">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="token-num">#G-049</div>
+            <span class="p-badge-senior">SENIOR</span>
+          </div>
+          <div class="token-meta">Joined 10:40 AM · 2m ago · Position #3</div>
+        </div>
+        <div class="token-card p-normal">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="token-num">#G-050</div>
+            <span class="p-badge-normal">NORMAL</span>
+          </div>
+          <div class="token-meta">Joined 10:41 AM · 1m ago · Position #4</div>
+        </div>
+        <div class="token-card p-normal">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="token-num">#G-051</div>
+            <span class="p-badge-normal">NORMAL</span>
+          </div>
+          <div class="token-meta">Joined 10:41 AM · 1m ago · Position #5</div>
+        </div>
+        <div style="text-align:center;padding:10px;font-size:12px;color:#94a3b8">+ 29 more tokens</div>
+      </div>
+    </div>
+
+    <!-- SERVING column -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;">
+      <div class="col-header">
+        <div class="live-dot"></div>
+        Now Serving <span class="badge-count" style="background:#d1fae5;color:#065f46;">2</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="token-card" style="border:2px solid #10b981;background:linear-gradient(to bottom right,#f0fdf4,#fff)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div class="token-num" style="font-size:20px;">#G-045</div>
+            <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">SERVING</span>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:12px">Called 5m ago · Normal</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-complete">✓ Complete</button>
+            <button class="btn-skip">→ Skip</button>
+            <button class="btn-cancel">✕ Cancel</button>
+          </div>
+        </div>
+        <div class="token-card" style="border:2px solid #10b981;background:linear-gradient(to bottom right,#f0fdf4,#fff)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div class="token-num" style="font-size:20px;">#G-043</div>
+            <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">SERVING</span>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:12px">Called 12m ago · Senior</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-complete">✓ Complete</button>
+            <button class="btn-skip">→ Skip</button>
+            <button class="btn-cancel">✕ Cancel</button>
+          </div>
+        </div>
+
+        <!-- Call next card -->
+        <div style="border:2px dashed #bfdbfe;border-radius:10px;padding:18px;text-align:center;">
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">Counter 3 available</div>
+          <button class="btn-call">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Call Next Token
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONE column -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;">
+      <div class="col-header">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Completed Today <span class="badge-count" style="background:#eef2ff;color:#4338ca;">89</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-right:4px;">
+        <div class="token-card" style="opacity:0.7">
+          <div style="display:flex;justify-content:space-between"><div class="token-num" style="font-size:13px;color:#64748b">#G-044</div><span style="background:#eef2ff;color:#4338ca;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px">COMPLETED</span></div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px">10:35 AM · 11m total</div>
+        </div>
+        <div class="token-card" style="opacity:0.7">
+          <div style="display:flex;justify-content:space-between"><div class="token-num" style="font-size:13px;color:#64748b">#G-042</div><span style="background:#eef2ff;color:#4338ca;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px">COMPLETED</span></div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px">10:30 AM · 9m total</div>
+        </div>
+        <div class="token-card" style="opacity:0.7">
+          <div style="display:flex;justify-content:space-between"><div class="token-num" style="font-size:13px;color:#64748b">#G-041</div><span style="background:#fff7ed;color:#9a3412;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px">SKIPPED</span></div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px">10:28 AM · skipped</div>
+        </div>
+        <div style="text-align:center;padding:10px;font-size:12px;color:#94a3b8">+ 86 more</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT B — FOCUS VIEW
+     Active token big + prominent top; waiting list below
+══════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+<div style="min-height:calc(100vh - 40px);background:#f8fafc;display:grid;grid-template-columns:1fr 360px;">
+  <!-- Left: Focus + waiting list -->
+  <div>
+    <!-- Queue header -->
+    <div style="background:#fff;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;padding:12px 24px;display:flex;align-items:center;gap:16px;">
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#0f172a">General OPD</div>
+        <div style="font-size:11px;color:#64748b">34 waiting · 2 serving · 18m avg</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;background:#dcfce7;color:#16a34a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;"><div class="live-dot"></div>OPEN</div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;">Close Queue</button>
+        <button class="btn-call" style="width:auto;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Call Next
+        </button>
+      </div>
+    </div>
+
+    <!-- Active serving focus -->
+    <div style="padding:20px 24px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#16a34a;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><div class="live-dot"></div>Now Serving</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:#fff;border:2px solid #10b981;border-radius:12px;padding:18px;background:linear-gradient(135deg,#f0fdf4,#fff);">
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0f172a;">#G-045</div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:#64748b;">Called 5 min ago</div>
+              <span class="p-badge-normal">NORMAL</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-complete" style="flex:1;justify-content:center;">✓ Complete</button>
+            <button class="btn-skip">→ Skip</button>
+          </div>
+        </div>
+        <div style="background:#fff;border:2px solid #10b981;border-radius:12px;padding:18px;background:linear-gradient(135deg,#f0fdf4,#fff);">
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0f172a;">#G-043</div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:#64748b;">Called 12 min ago</div>
+              <span class="p-badge-senior">SENIOR</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-complete" style="flex:1;justify-content:center;">✓ Complete</button>
+            <button class="btn-skip">→ Skip</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waiting list -->
+    <div style="padding:16px 24px;border-right:1px solid #e2e8f0;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:10px;">Up Next</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="token-card p-emergency" style="display:flex;align-items:center;gap:12px;padding:10px 14px;">
+          <div style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a;min-width:56px">#G-047</div>
+          <span class="p-badge-emergency">EMERGENCY</span>
+          <span style="font-size:11px;color:#64748b;">4m waiting</span>
+          <span style="font-size:11px;color:#64748b;margin-left:auto">Position #1</span>
+        </div>
+        <div class="token-card p-vip" style="display:flex;align-items:center;gap:12px;padding:10px 14px;">
+          <div style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a;min-width:56px">#G-048</div>
+          <span class="p-badge-vip">VIP</span>
+          <span style="font-size:11px;color:#64748b;">3m waiting</span>
+          <span style="font-size:11px;color:#64748b;margin-left:auto">Position #2</span>
+        </div>
+        <div class="token-card p-senior" style="display:flex;align-items:center;gap:12px;padding:10px 14px;">
+          <div style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a;min-width:56px">#G-049</div>
+          <span class="p-badge-senior">SENIOR</span>
+          <span style="font-size:11px;color:#64748b;">2m waiting</span>
+          <span style="font-size:11px;color:#64748b;margin-left:auto">Position #3</span>
+        </div>
+        <div class="token-card p-normal" style="display:flex;align-items:center;gap:12px;padding:10px 14px;">
+          <div style="font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a;min-width:56px">#G-050</div>
+          <span class="p-badge-normal">NORMAL</span>
+          <span style="font-size:11px;color:#64748b;">1m waiting</span>
+          <span style="font-size:11px;color:#64748b;margin-left:auto">Position #4</span>
+        </div>
+        <div style="padding:8px 14px;font-size:12px;color:#94a3b8;text-align:center">+ 30 more in queue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Stats panel -->
+  <div style="background:#fff;border-left:1px solid #e2e8f0;padding:20px;">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:14px">Session Stats</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border-radius:7px;">
+        <span style="font-size:13px;color:#64748b">Tokens Today</span>
+        <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#0f172a">247</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border-radius:7px;">
+        <span style="font-size:13px;color:#64748b">Completed</span>
+        <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#16a34a">89</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fef3c7;border-radius:7px;">
+        <span style="font-size:13px;color:#92400e">Avg Wait</span>
+        <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#92400e">18m</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border-radius:7px;">
+        <span style="font-size:13px;color:#64748b">Skipped</span>
+        <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#dc2626">4</span>
+      </div>
+    </div>
+
+    <!-- Priority modal demo -->
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:10px;">Priority Queue</div>
+    <div style="background:#fff3cd;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:6px;">⚠ 2 EMERGENCY tokens waiting</div>
+      <div style="font-size:12px;color:#92400e">#G-047, #G-055 — should be called next</div>
+    </div>
+    <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:6px;">1 VIP token in queue</div>
+      <div style="font-size:12px;color:#6d28d9">#G-048 — expedited service available</div>
+    </div>
+
+    <!-- Close queue action -->
+    <div style="margin-top:20px;border-top:1px solid #f1f5f9;padding-top:16px;">
+      <button style="width:100%;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+        🔒 Close This Queue
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT C — COMMAND BAR
+     Keyboard-first, dense list, toolbar actions
+══════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+<div style="min-height:calc(100vh - 40px);background:#09090b;font-family:'JetBrains Mono',monospace;">
+
+  <!-- Command bar header -->
+  <div style="background:#111113;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;display:flex;align-items:center;gap:0;height:48px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-right:24px;">
+      <span style="font-size:14px;font-weight:600;color:#fafafa;">General OPD</span>
+      <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#10b981;background:rgba(16,185,129,0.1);padding:2px 8px;border-radius:4px;">OPEN</span>
+    </div>
+
+    <!-- Toolbar actions -->
+    <div style="display:flex;gap:1px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;">
+      <button style="background:#2563eb;color:#fff;border:none;padding:7px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        call next [space]
+      </button>
+      <button style="background:rgba(255,255,255,0.04);color:#a1a1aa;border:none;padding:7px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;">complete [c]</button>
+      <button style="background:rgba(255,255,255,0.04);color:#a1a1aa;border:none;padding:7px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;">skip [s]</button>
+      <button style="background:rgba(255,255,255,0.04);color:#ef4444;border:none;padding:7px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;">close queue [q]</button>
+    </div>
+
+    <div style="margin-left:auto;display:flex;align-items:center;gap:16px;">
+      <span style="font-size:11px;color:#52525b;">34 waiting · 2 serving · 18m avg</span>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#10b981;"><div class="live-dot"></div>live</div>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div style="display:flex;gap:1px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="flex:1;padding:10px 20px;background:#111113;">
+      <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">WAITING</div>
+      <div style="font-size:20px;font-weight:700;color:#f59e0b;">34</div>
+    </div>
+    <div style="flex:1;padding:10px 20px;background:#111113;">
+      <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">SERVING</div>
+      <div style="font-size:20px;font-weight:700;color:#10b981;">2</div>
+    </div>
+    <div style="flex:1;padding:10px 20px;background:#111113;">
+      <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">COMPLETED</div>
+      <div style="font-size:20px;font-weight:700;color:#6366f1;">89</div>
+    </div>
+    <div style="flex:1;padding:10px 20px;background:#111113;">
+      <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">SKIPPED</div>
+      <div style="font-size:20px;font-weight:700;color:#ef4444;">4</div>
+    </div>
+    <div style="flex:1;padding:10px 20px;background:#111113;">
+      <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">AVG WAIT</div>
+      <div style="font-size:20px;font-weight:700;color:#f59e0b;">18m</div>
+    </div>
+  </div>
+
+  <!-- Token table -->
+  <div style="padding:16px 24px;">
+    <!-- Serving section -->
+    <div style="font-size:10px;color:#10b981;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;font-weight:600;">● Now Serving</div>
+    <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:16px;">
+      <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:5px;padding:10px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:14px;font-weight:600;color:#10b981;min-width:80px;">#G-045</span>
+        <span style="font-size:11px;color:#52525b;background:rgba(255,255,255,0.04);padding:2px 8px;border-radius:4px;margin-right:12px;">NORMAL</span>
+        <span style="font-size:12px;color:#a1a1aa;flex:1;">called 5m ago</span>
+        <div style="display:flex;gap:4px;">
+          <button style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">complete [c]</button>
+          <button style="background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">skip [s]</button>
+        </div>
+      </div>
+      <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:5px;padding:10px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:14px;font-weight:600;color:#10b981;min-width:80px;">#G-043</span>
+        <span style="font-size:11px;color:#0e7490;background:rgba(14,116,144,0.1);padding:2px 8px;border-radius:4px;margin-right:12px;">SENIOR</span>
+        <span style="font-size:12px;color:#a1a1aa;flex:1;">called 12m ago</span>
+        <div style="display:flex;gap:4px;">
+          <button style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">complete [c]</button>
+          <button style="background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;">skip [s]</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waiting list -->
+    <div style="font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;font-weight:600;">Waiting Queue</div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <div style="background:#111113;border:1px solid #ef4444;border-radius:4px;padding:9px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:12px;font-weight:600;color:#fafafa;min-width:80px;">#G-047</span>
+        <span style="font-size:10px;color:#ef4444;background:rgba(239,68,68,0.1);padding:1px 7px;border-radius:3px;margin-right:12px;font-weight:700;">EMERGENCY</span>
+        <span style="font-size:11px;color:#52525b;flex:1;">4m waiting · pos #1</span>
+        <span style="font-size:10px;color:#52525b;">Ravi Kumar</span>
+      </div>
+      <div style="background:#111113;border:1px solid rgba(124,58,237,0.3);border-radius:4px;padding:9px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:12px;font-weight:600;color:#fafafa;min-width:80px;">#G-048</span>
+        <span style="font-size:10px;color:#7c3aed;background:rgba(124,58,237,0.1);padding:1px 7px;border-radius:3px;margin-right:12px;font-weight:700;">VIP</span>
+        <span style="font-size:11px;color:#52525b;flex:1;">3m waiting · pos #2</span>
+        <span style="font-size:10px;color:#52525b;"></span>
+      </div>
+      <div style="background:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:9px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:12px;font-weight:600;color:#fafafa;min-width:80px;">#G-049</span>
+        <span style="font-size:10px;color:#0e7490;background:rgba(14,116,144,0.1);padding:1px 7px;border-radius:3px;margin-right:12px;font-weight:700;">SENIOR</span>
+        <span style="font-size:11px;color:#52525b;flex:1;">2m waiting · pos #3</span>
+        <span style="font-size:10px;color:#52525b;"></span>
+      </div>
+      <div style="background:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:9px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:12px;color:#a1a1aa;min-width:80px;">#G-050</span>
+        <span style="font-size:10px;color:#52525b;background:rgba(255,255,255,0.04);padding:1px 7px;border-radius:3px;margin-right:12px;">NORMAL</span>
+        <span style="font-size:11px;color:#52525b;flex:1;">1m waiting · pos #4</span>
+      </div>
+      <div style="background:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:9px 16px;display:flex;align-items:center;gap:0;">
+        <span style="font-size:12px;color:#a1a1aa;min-width:80px;">#G-051</span>
+        <span style="font-size:10px;color:#52525b;background:rgba(255,255,255,0.04);padding:1px 7px;border-radius:3px;margin-right:12px;">NORMAL</span>
+        <span style="font-size:11px;color:#52525b;flex:1;">1m waiting · pos #5</span>
+      </div>
+      <div style="padding:10px 16px;font-size:11px;color:#3f3f46;text-align:center;">+ 29 more · scroll to load</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
