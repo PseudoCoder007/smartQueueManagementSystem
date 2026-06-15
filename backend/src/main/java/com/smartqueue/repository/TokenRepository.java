@@ -3,6 +3,7 @@ package com.smartqueue.repository;
 import com.smartqueue.domain.QueueSessionStatus;
 import com.smartqueue.domain.Token;
 import com.smartqueue.domain.TokenStatus;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,11 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
   long countByQueueSessionIdAndStatus(UUID queueSessionId, TokenStatus status);
   long countByServiceId(UUID serviceId);
   long countByStatus(TokenStatus status);
+  long countByUserIdAndServiceIdAndStatusAndCancelledAtAfter(UUID userId, UUID serviceId, TokenStatus status, Instant since);
+  Optional<Token> findTopByUserIdAndServiceIdAndStatusOrderByCancelledAtDesc(UUID userId, UUID serviceId, TokenStatus status);
+
+  @Query("SELECT t FROM Token t JOIN FETCH t.service WHERE t.queueSession.id = :sessionId ORDER BY t.createdAt ASC")
+  List<Token> findByQueueSessionIdWithServiceOrderByCreatedAtAsc(@Param("sessionId") UUID sessionId);
 
   @Query("""
       select count(t) from Token t

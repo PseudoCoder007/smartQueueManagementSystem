@@ -33,6 +33,7 @@ export function AdminServicesPage() {
     try {
       active ? await adminApi.deactivate(id, session!.token) : await adminApi.activate(id, session!.token);
       await reload();
+      toast.success(active ? 'Service deactivated' : 'Service activated');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to update service');
     }
@@ -42,12 +43,13 @@ export function AdminServicesPage() {
     try {
       open ? await adminApi.close(id, session!.token) : await adminApi.open(id, session!.token);
       await reload();
+      toast.success(open ? 'Queue closed' : 'Queue opened');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to update queue');
     }
   }
 
-  if (loading) return <Loading />;
+  if (loading && !data) return <Loading />;
   if (error) return <ErrorState message={error} />;
 
   return (
@@ -56,7 +58,7 @@ export function AdminServicesPage() {
         <h1>Service Management</h1>
       </div>
 
-      <form className="form-grid" onSubmit={submit} style={{ gridTemplateColumns: '1fr 2fr 100px auto', alignItems: 'end', gap: 10, marginBottom: 24 }}>
+      <form className="form-grid services-form" onSubmit={submit} style={{ marginBottom: 24 }}>
         <div>
           <label>Service name</label>
           <input required placeholder="e.g. General OPD" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />

@@ -25,7 +25,7 @@ class StatsServiceTest {
     when(tokens.countByStatus(TokenStatus.COMPLETED)).thenReturn(0L);
     when(tokens.countByStatus(TokenStatus.SKIPPED)).thenReturn(0L);
     when(tokens.countByStatus(TokenStatus.CANCELLED)).thenReturn(0L);
-    when(tokens.averageWaitMinutes()).thenReturn(null);
+    when(tokens.averageWaitMinutes(TokenStatus.COMPLETED)).thenReturn(null);
 
     assertThat(stats.overview().averageWaitMinutes()).isZero();
   }

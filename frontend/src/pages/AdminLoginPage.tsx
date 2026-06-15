@@ -17,8 +17,8 @@ export function AdminLoginPage() {
     try {
       await adminLogin(email, password);
       toast.success('Signed in successfully.');
-    } catch {
-      toast.error('Access denied for this user');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }

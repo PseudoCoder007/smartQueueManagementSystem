@@ -23,7 +23,9 @@ export function ServiceDetailPage() {
   async function createToken() {
     setPending(true);
     try {
-      setCreated(await userApi.createToken(serviceId, priorityType, session!.token));
+      const token = await userApi.createToken(serviceId, priorityType, session!.token);
+      toast.success(`Token #${token.tokenNumber} generated!`);
+      setCreated(token);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to generate token');
     } finally {

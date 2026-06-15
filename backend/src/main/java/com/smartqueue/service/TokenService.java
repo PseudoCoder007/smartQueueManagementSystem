@@ -7,6 +7,9 @@ import com.smartqueue.repository.QueueSessionRepository;
 import com.smartqueue.repository.TokenRepository;
 import com.smartqueue.websocket.QueueEventPublisher;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,21 @@ public class TokenService {
         .orElseThrow(() -> new BadRequestException("Queue is closed"));
     if (tokens.existsByUserIdAndQueueSessionIdAndStatusIn(user.getId(), session.getId(), ACTIVE)) {
       throw new BadRequestException("User already has an active token for this queue");
+    }
+    Instant since24h = Instant.now().minus(24, ChronoUnit.HOURS);
+    long recentCancels = tokens.countByUserIdAndServiceIdAndStatusAndCancelledAtAfter(
+        user.getId(), service.getId(), TokenStatus.CANCELLED, since24h);
+    if (recentCancels >= 3) {
+      tokens.findTopByUserIdAndServiceIdAndStatusOrderByCancelledAtDesc(
+          user.getId(), service.getId(), TokenStatus.CANCELLED
+      ).ifPresent(last -> {
+        Instant unblockAt = last.getCancelledAt().plus(1, ChronoUnit.HOURS);
+        if (Instant.now().isBefore(unblockAt)) {
+          throw new BadRequestException(
+              "You have cancelled 3 times today. You can rejoin after " +
+              DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneOffset.UTC).format(unblockAt) + " UTC.");
+        }
+      });
     }
     Token token = new Token();
     token.setUser(user);

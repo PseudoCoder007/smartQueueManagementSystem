@@ -41,11 +41,19 @@ export function AdminQueuePage() {
   const refresh = useCallback(() => void reload(), [reload]);
   const connected = useQueueSocket([`/topic/queues/${serviceId}`, '/topic/admin/queues'], refresh);
 
+  const SUCCESS: Record<string, string> = {
+    open: 'Queue opened', close: 'Queue closed',
+    next: 'Next token called', complete: 'Token completed',
+    skip: 'Token skipped', recall: 'Token recalled',
+    call: 'Token called', priority: 'Priority updated',
+  };
+
   async function run(label: string, action: () => Promise<unknown>) {
     setPending(label);
     try {
       await action();
       await reload();
+      if (SUCCESS[label]) toast.success(SUCCESS[label]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Action failed');
     } finally {
@@ -59,7 +67,7 @@ export function AdminQueuePage() {
     setPriorityDialog(null);
   }
 
-  if (loading) return <Loading />;
+  if (loading && !data) return <Loading />;
   if (error) return <ErrorState message={error} />;
   if (!data) return null;
 
@@ -70,7 +78,7 @@ export function AdminQueuePage() {
         <h1 style={{ fontSize: 16, fontWeight: 700, marginRight: 4 }}>{data.serviceName}</h1>
         <span className={`badge ${data.open ? 'ok' : 'warn'}`}>{data.open ? 'Open' : 'Closed'}</span>
         <SocketBadge connected={connected} />
-        <div className="toolbar" style={{ marginLeft: 'auto' }}>
+        <div className="toolbar kanban-toolbar">
           <button className="btn-secondary btn-sm" disabled={!!pending || data.open} onClick={() => run('open', () => adminApi.open(serviceId, session!.token))}>Open Queue</button>
           <button className="btn-danger btn-sm" disabled={!!pending || !data.open} onClick={() => run('close', () => adminApi.close(serviceId, session!.token))}>Close Queue</button>
           <button disabled={!!pending || !data.waiting.length} onClick={() => run('next', () => adminApi.next(serviceId, session!.token))}>

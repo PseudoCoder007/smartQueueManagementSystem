@@ -1,9 +1,11 @@
-import { LogOut } from 'lucide-react';
+import { LogOut, Moon, Sun } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { useTheme } from '../hooks/useTheme';
 
 export function AppLayout({ admin = false }: { admin?: boolean }) {
   const { session, logout } = useAuth();
+  const { theme, toggle } = useTheme();
   const links = admin
     ? [['/admin', 'Overview'], ['/admin/services', 'Services'], ['/admin/stats', 'Stats']] as const
     : [['/dashboard', 'Dashboard'], ['/services', 'Services'], ['/my-tokens', 'My Tokens']] as const;
@@ -27,6 +29,9 @@ export function AppLayout({ admin = false }: { admin?: boolean }) {
         </nav>
         <div className="topnav-end">
           <span className="topnav-email">{session?.user.email}</span>
+          <button className="icon-button" onClick={toggle} title="Toggle theme">
+            {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
           <button className="icon-button" onClick={logout} title="Sign out"><LogOut size={15} /></button>
         </div>
       </header>

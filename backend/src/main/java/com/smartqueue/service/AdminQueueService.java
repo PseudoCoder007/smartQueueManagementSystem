@@ -59,6 +59,7 @@ public class AdminQueueService {
     return state(serviceId);
   }
 
+  @Transactional(readOnly = true)
   public QueueDtos.QueueStateResponse state(UUID serviceId) {
     ServiceQueue service = serviceQueues.require(serviceId);
     QueueSession session = sessions.findByServiceIdAndStatus(serviceId, QueueSessionStatus.OPEN).orElse(null);
@@ -66,7 +67,7 @@ public class AdminQueueService {
       return new QueueDtos.QueueStateResponse(serviceId, service.getName(), false, null, 0,
           List.of(), List.of(), List.of(), List.of(), List.of());
     }
-    List<Token> all = tokens.findByQueueSessionIdOrderByCreatedAtAsc(session.getId());
+    List<Token> all = tokens.findByQueueSessionIdWithServiceOrderByCreatedAtAsc(session.getId());
     Integer current = all.stream().filter(t -> t.getStatus() == TokenStatus.SERVING).findFirst()
         .map(Token::getTokenNumber).orElse(null);
     return new QueueDtos.QueueStateResponse(serviceId, service.getName(), true, current,

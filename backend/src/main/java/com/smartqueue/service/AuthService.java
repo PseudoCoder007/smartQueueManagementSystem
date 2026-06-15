@@ -42,10 +42,12 @@ public class AuthService {
 
   public AuthDtos.AdminLoginResponse loginAdmin(AuthDtos.AdminLoginRequest request) {
     AppUser admin = users.findByEmailIgnoreCase(request.email())
-        .filter(user -> user.getRole() == UserRole.ADMIN)
-        .orElseThrow(() -> new ForbiddenException("Invalid admin credentials"));
+        .orElseThrow(() -> new ForbiddenException("No admin account found for that email address"));
+    if (admin.getRole() != UserRole.ADMIN) {
+      throw new ForbiddenException("No admin account found for that email address");
+    }
     if (admin.getPasswordHash() == null || !passwordEncoder.matches(request.password(), admin.getPasswordHash())) {
-      throw new ForbiddenException("Invalid admin credentials");
+      throw new ForbiddenException("Incorrect password");
     }
     var profile = new AuthDtos.UserProfile(admin.getId(), admin.getEmail(), admin.getName(), admin.getRole());
     return new AuthDtos.AdminLoginResponse(jwtService.createToken(admin), admin.getRole(), profile);

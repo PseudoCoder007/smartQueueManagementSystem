@@ -33,6 +33,18 @@
   --transition: 130ms ease;
 }
 
+:root.light {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-raised: #f1f5f9;
+  --surface-hover: rgba(0,0,0,0.03);
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.14);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #94a3b8;
+}
+
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -375,6 +387,7 @@ label { color: var(--text-muted); display: block; font-size: 12px; font-weight: 
 
 /* === FORM GRID === */
 .form-grid { display: grid; gap: 10px; grid-template-columns: 1fr 2fr 100px auto; margin-bottom: 18px; align-items: end; }
+.services-form { grid-template-columns: 1fr 2fr 100px auto; }
 
 /* === ADMIN TABLE ROW (flexible) === */
 .admin-row {
@@ -417,6 +430,7 @@ label { color: var(--text-muted); display: block; font-size: 12px; font-weight: 
   gap: 10px;
   padding: 10px 20px;
 }
+.kanban-toolbar { margin-left: auto; }
 .kanban-cols {
   display: grid;
   flex: 1;
@@ -537,10 +551,57 @@ label { color: var(--text-muted); display: block; font-size: 12px; font-weight: 
 
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
-  .kanban-cols { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  .kanban-cols { grid-template-columns: 1fr 1fr; height: auto; overflow: visible; }
   .kanban-layout { height: auto; overflow: visible; }
-  .form-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
   .row, .token-row { grid-template-columns: 1fr; }
-  .page { padding: 16px; }
+  .page { padding: 20px; }
   .metrics { grid-template-columns: 1fr 1fr; }
+  .admin-row-actions { flex-wrap: wrap; }
+}
+
+@media (max-width: 768px) {
+  .topnav { flex-wrap: wrap; height: auto; padding: 8px 16px; }
+  .topnav-links { width: 100%; border-top: 1px solid var(--border); height: auto; overflow-x: auto; }
+  .topnav-link { padding: 8px 12px; border-bottom: none; border-bottom: 2px solid transparent; }
+  .topnav-link.active { border-bottom-color: var(--primary); }
+  .topnav-brand { margin-right: 0; }
+  .topnav-end { margin-left: auto; }
+  .kanban-cols { grid-template-columns: 1fr; }
+  .kanban-topbar { flex-wrap: wrap; }
+  .form-grid { grid-template-columns: 1fr; }
+  .page { padding: 16px 14px; }
+  .auth-hero { padding: 36px 16px 52px; }
+  .auth-hero-title { font-size: 24px; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .topnav-email { display: none; }
+  .topnav-link { flex: 1; justify-content: center; text-align: center; }
+  .admin-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .admin-row-actions { width: 100%; margin-left: 0; }
+  .auth-hero-title { font-size: 20px; }
+  .auth-card-wrap { margin-top: -20px; padding: 0 12px 32px; }
+  .auth-panel { padding: 16px 18px; }
+  .tracking-token-num { font-size: 36px; }
+  .modal { margin: 0 16px; width: calc(100% - 32px); padding: 20px; }
+  .page { padding: 12px 10px; }
+  .metrics { grid-template-columns: 1fr; }
+  .row, .token-row { grid-template-columns: 1fr; }
+  .services-form { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .auth-hero-title { font-size: 18px; }
+  .tracking-token-num { font-size: 28px; }
+  .metric-value { font-size: 20px; }
+  .topnav { padding: 6px 10px; }
+  .badge { font-size: 9px; }
+  .btn-lg { min-height: 38px; }
+  .kanban-topbar { flex-direction: column; align-items: flex-start; }
+  .kanban-toolbar { width: 100%; margin-left: 0; flex-wrap: wrap; }
+  .kanban-toolbar button { flex: 1; }
+  .auth-card-wrap { padding: 0 8px 24px; }
+  .auth-panel { max-width: 100%; padding: 16px 14px; box-shadow: none; }
 }
