@@ -3,6 +3,8 @@ package com.smartqueue.config;
 import com.smartqueue.security.JwtAuthFilter;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+  private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter filter) throws Exception {
     return http
@@ -43,7 +47,9 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}") String origins) {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).toList());
+    List<String> allowedOrigins = Arrays.stream(origins.split(",")).map(String::trim).toList();
+    log.info("CORS allowed origins resolved to: {}", allowedOrigins);
+    config.setAllowedOrigins(allowedOrigins);
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
