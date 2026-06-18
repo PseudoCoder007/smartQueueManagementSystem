@@ -37,3 +37,4 @@ app:
   resend:
     api-key: ${RESEND_API_KEY:}
     from-email: ${RESEND_FROM_EMAIL:Smart Queue <no-reply@smart-queue.in>}
+  frontend-url: ${FRONTEND_URL:https://smart-queue.in}

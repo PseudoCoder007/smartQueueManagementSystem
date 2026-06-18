@@ -44,25 +44,39 @@ Each service has its own token sequence, current serving token, waiting list, av
 
 Services with token history should not be hard-deleted. They should be deactivated so old reports and queue events remain correct.
 
-## 2. Supabase Email OTP User Login
+## 2. User Sign-In And Sign-Up
 
-Users log in with email OTP instead of a normal password.
+Users can reach the dashboard through three independent sign-in methods, all backed by Supabase Auth. Whichever method is used, the frontend ends up with a Supabase access token, which it exchanges for an application JWT at `/api/auth/user/supabase-sync`. That endpoint creates the local `users` row on first sign-in (role `USER`) and updates it on every later sign-in.
 
-### How It Works
+### Password Sign-In And Sign-Up
 
-1. User enters email.
-2. Frontend asks Supabase to send an OTP or magic link.
-3. User verifies the OTP.
-4. Supabase returns a session/access token.
-5. Frontend sends the Supabase token to the Spring Boot backend.
-6. Backend validates the token and creates or updates the local `users` record.
-7. User can access protected user features.
+- The login page has a "Sign in" / "Create account" switch under the Password tab.
+- Creating an account calls `supabase.auth.signUp`. If Supabase is configured to require email confirmation, the user gets a verification email instead of an immediate session.
+- Signing in calls `supabase.auth.signInWithPassword`.
+- If sign-in fails because no account exists for that email, the page shows an inline "Don't have an account yet? Create one" hint instead of just a generic error, so the user isn't stuck guessing why password sign-in failed.
 
-### Why This Is Used
+### Email Verification (First-Time Signup)
 
-- Users can log in quickly.
-- No user password storage is required in the application backend.
-- Login feels real-time and simple.
+- After signup, Supabase emails a verification link pointing at `/otp-callback`.
+- Clicking the link signs the user straight into the dashboard — it does not bounce back to the login page. This works because `OtpCallbackPage` polls `supabase.auth.getSession()` for a short window after load instead of checking once: Supabase's implicit-flow links deliver the session through the URL hash, which the client SDK parses asynchronously, so a single immediate check can race that parsing and find nothing yet.
+
+### Email OTP / Magic Link Sign-In
+
+- The OTP tab calls `supabase.auth.signInWithOtp`, which emails either a one-time code or a magic link (Supabase project setting controls which).
+- Clicking the magic link goes through the same `/otp-callback` polling logic above, so it logs the user in directly rather than landing back on the login page.
+
+### Forgot Password
+
+- A small left-aligned "Forgot password?" link sits under the password field (a plain link-styled button, not a full-width button, to avoid competing visually with the main sign-in action).
+- It calls `supabase.auth.resetPasswordForEmail`, which emails a recovery link pointing at `/reset-password`.
+- `ResetPasswordPage` waits for the recovery session (same hash-polling approach as `/otp-callback`), then lets the user set a new password via `supabase.auth.updateUser({ password })`, syncs the session to the backend, and redirects to the dashboard.
+
+### Google OAuth Sign-In
+
+- A "Continue with Google" button sits above the Password/OTP tabs, with an "or" divider beneath it.
+- It calls `supabase.auth.signInWithOAuth({ provider: 'google' })`, redirecting to Google and back through `/otp-callback`.
+- The Google OAuth Client ID and Secret are configured entirely in the Supabase dashboard (Authentication → Providers → Google) — neither value lives in this codebase. Supabase performs the OAuth code/token exchange on its own backend.
+- No backend changes were needed to support this: `SupabaseAuthService.validate()` validates any Supabase access token against Supabase's `/auth/v1/user` endpoint regardless of which provider issued it.
 
 ## 3. Backend-Managed Admin Accounts
 
@@ -76,7 +90,7 @@ Admin accounts are created from the backend through one of these controlled opti
 - Protected internal backend endpoint.
 - Database migration/initialization process.
 
-The public user OTP login flow must always create or sync users with the `USER` role only. Admin role assignment must be restricted to backend-controlled operations.
+The public user sign-in flows (password, OTP, Google) must always create or sync users with the `USER` role only. Admin role assignment must be restricted to backend-controlled operations.
 
 ## 4. Virtual Token Generation
 
@@ -91,6 +105,7 @@ After login, a user selects an active service and generates a token.
 5. Backend stores the token as `WAITING`.
 6. Backend calculates queue position and estimated wait time.
 7. Backend broadcasts queue updates through WebSockets.
+8. Backend emails the user a "you're in the queue" confirmation (see Email Notifications).
 
 ### Token Information Shown To User
 
@@ -193,16 +208,21 @@ Admins can view operational performance.
 - Average service time.
 - Service-wise token count.
 
-## 10. Notifications
+## 10. Email Notifications
 
-Phase 1 notifications are in-app and WebSocket based.
+Transactional email is sent through [Resend](https://resend.com) via `EmailService`, using a raw `HttpClient` call to the Resend API on a dedicated background thread so sending never blocks a request. If `RESEND_API_KEY` is not configured, the service logs and skips the send instead of failing — local development works without an API key.
 
-Examples:
+### Emails Sent
 
-- Your token was created.
-- Your token is almost next.
-- Your token is being called.
-- Your token was skipped.
-- Queue was closed.
+- **Welcome email** — sent the first time a user's Supabase identity is synced to the backend (`AuthService.syncSupabaseUser`, when no local user existed yet).
+- **Sign-in notification** — sent on every later sign-in (password, OTP, or Google), and on every admin password login, as a lightweight "new sign-in to your account" alert.
+- **Token created** — sent immediately after a token is generated, confirming the token number, service, queue position, and estimated wait.
+- **Turn reminder** — sent once per token, the moment its estimated wait drops to 5 minutes or less, asking the user to come and take their item or complete billing. A `five_min_reminder_sent_at` timestamp on the `tokens` table (added in `V2__add_token_reminder_sent_at.sql`) guarantees this fires only once per token even though wait time is recalculated repeatedly as the queue moves.
 
-SMS, WhatsApp, and push notifications are Phase 2.
+### Why This Is Used
+
+- Users do not need to keep the tab open to know their turn is close.
+- No third-party SMS cost — email covers the same "come back now" need for an MVP.
+- Reminder logic lives in the same `recalculate()` pass that already updates positions, so it stays consistent with what the UI shows.
+
+SMS, WhatsApp, and push notifications remain Phase 2 ideas (see `docs/project-roadmap.md`).
