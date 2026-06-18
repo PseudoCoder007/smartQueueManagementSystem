@@ -217,6 +217,7 @@ Transactional email is sent through [Resend](https://resend.com) via `EmailServi
 - **Welcome email** — sent the first time a user's Supabase identity is synced to the backend (`AuthService.syncSupabaseUser`, when no local user existed yet).
 - **Sign-in notification** — sent on every later sign-in (password, OTP, or Google), and on every admin password login, as a lightweight "new sign-in to your account" alert.
 - **Token created** — sent immediately after a token is generated, confirming the token number, service, queue position, and estimated wait.
+- **Token cancelled** — sent when a user cancels their own waiting token.
 - **Turn reminder** — sent once per token, the moment its estimated wait drops to 5 minutes or less, asking the user to come and take their item or complete billing. A `five_min_reminder_sent_at` timestamp on the `tokens` table (added in `V2__add_token_reminder_sent_at.sql`) guarantees this fires only once per token even though wait time is recalculated repeatedly as the queue moves.
 
 ### Why This Is Used

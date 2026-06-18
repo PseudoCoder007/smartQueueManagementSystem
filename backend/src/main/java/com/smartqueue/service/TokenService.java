@@ -116,6 +116,8 @@ public class TokenService {
     token.setCancelledAt(Instant.now());
     recalculate(token.getQueueSession());
     audit.record(token, QueueEventType.TOKEN_CANCELLED, user, "User cancelled token");
+    emailService.sendTokenCancelled(user.getEmail(), user.getName(), token.getService().getName(),
+        token.getTokenNumber());
     TokenDtos.TokenResponse response = mapper.token(token);
     publisher.queueChanged("TOKEN_CANCELLED", token.getService().getId(), token.getId(), response);
     publisher.userTokenChanged("TOKEN_CANCELLED", token.getService().getId(), user.getId(), token.getId(), response);

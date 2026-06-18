@@ -55,6 +55,14 @@ public class EmailService {
         "Track My Token", frontendUrl + "/my-tokens"));
   }
 
+  public void sendTokenCancelled(String to, String name, String serviceName, int tokenNumber) {
+    sendAsync(to, "Your token was cancelled - Smart Queue", wrap("Token cancelled",
+        "Hi " + esc(displayName(name)) + ", your token <strong>#" + tokenNumber + "</strong> for "
+            + "<strong>" + esc(serviceName) + "</strong> has been cancelled. You can join the queue again "
+            + "any time.",
+        "Join Another Queue", frontendUrl + "/services"));
+  }
+
   public void sendSignInNotification(String to, String name) {
     sendAsync(to, "New sign-in to your Smart Queue account", wrap("New sign-in detected",
         "Hi " + esc(displayName(name)) + ", we noticed a new sign-in to your Smart Queue account. "
