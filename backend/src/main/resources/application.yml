@@ -34,3 +34,6 @@ app:
     password: ${ADMIN_PASSWORD:}
   dev-auth:
     enabled: ${DEV_AUTH_ENABLED:false}
+  resend:
+    api-key: ${RESEND_API_KEY:}
+    from-email: ${RESEND_FROM_EMAIL:Smart Queue <no-reply@smart-queue.in>}

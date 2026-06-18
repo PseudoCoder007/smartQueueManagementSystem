@@ -24,15 +24,18 @@ public class TokenService {
   private final QueueAuditService audit;
   private final QueueMapper mapper;
   private final QueueEventPublisher publisher;
+  private final EmailService emailService;
 
   public TokenService(ServiceQueueService serviceQueues, QueueSessionRepository sessions,
-      TokenRepository tokens, QueueAuditService audit, QueueMapper mapper, QueueEventPublisher publisher) {
+      TokenRepository tokens, QueueAuditService audit, QueueMapper mapper, QueueEventPublisher publisher,
+      EmailService emailService) {
     this.serviceQueues = serviceQueues;
     this.sessions = sessions;
     this.tokens = tokens;
     this.audit = audit;
     this.mapper = mapper;
     this.publisher = publisher;
+    this.emailService = emailService;
   }
 
   @Transactional
@@ -128,6 +131,11 @@ public class TokenService {
       Token token = ordered.get(index);
       token.setPositionSnapshot(index + 1);
       token.setEstimatedWaitMinutes(index * token.getService().getAverageServiceMinutes());
+      if (token.getEstimatedWaitMinutes() <= 5 && token.getFiveMinReminderSentAt() == null) {
+        token.setFiveMinReminderSentAt(Instant.now());
+        emailService.sendTurnReminder(token.getUser().getEmail(), token.getUser().getName(),
+            token.getService().getName(), token.getTokenNumber());
+      }
     }
     tokens.saveAll(ordered);
   }

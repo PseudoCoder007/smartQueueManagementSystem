@@ -62,6 +62,9 @@ public class Token {
   @Column(name = "cancelled_at")
   private Instant cancelledAt;
 
+  @Column(name = "five_min_reminder_sent_at")
+  private Instant fiveMinReminderSentAt;
+
   public UUID getId() { return id; }
   public Integer getTokenNumber() { return tokenNumber; }
   public void setTokenNumber(Integer tokenNumber) { this.tokenNumber = tokenNumber; }
@@ -90,4 +93,6 @@ public class Token {
   public void setCompletedAt(Instant completedAt) { this.completedAt = completedAt; }
   public Instant getCancelledAt() { return cancelledAt; }
   public void setCancelledAt(Instant cancelledAt) { this.cancelledAt = cancelledAt; }
+  public Instant getFiveMinReminderSentAt() { return fiveMinReminderSentAt; }
+  public void setFiveMinReminderSentAt(Instant fiveMinReminderSentAt) { this.fiveMinReminderSentAt = fiveMinReminderSentAt; }
 }

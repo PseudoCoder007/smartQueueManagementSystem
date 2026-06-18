@@ -15,13 +15,15 @@ public class AuthService {
   private final SupabaseAuthService supabaseAuth;
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
+  private final EmailService emailService;
 
   public AuthService(UserRepository users, SupabaseAuthService supabaseAuth,
-      JwtService jwtService, PasswordEncoder passwordEncoder) {
+      JwtService jwtService, PasswordEncoder passwordEncoder, EmailService emailService) {
     this.users = users;
     this.supabaseAuth = supabaseAuth;
     this.jwtService = jwtService;
     this.passwordEncoder = passwordEncoder;
+    this.emailService = emailService;
   }
 
   @Transactional
@@ -30,12 +32,18 @@ public class AuthService {
     AppUser user = users.findBySupabaseUserId(supabaseUser.id())
         .or(() -> users.findByEmailIgnoreCase(supabaseUser.email()))
         .orElseGet(AppUser::new);
+    boolean isNewUser = user.getId() == null;
     user.setSupabaseUserId(supabaseUser.id());
     user.setEmail(supabaseUser.email().toLowerCase());
     user.setName(supabaseUser.name());
     user.setRole(UserRole.USER);
     user.setPasswordHash(null);
     users.save(user);
+    if (isNewUser) {
+      emailService.sendWelcomeEmail(user.getEmail(), user.getName());
+    } else {
+      emailService.sendSignInNotification(user.getEmail(), user.getName());
+    }
     return new AuthDtos.UserSyncResponse(user.getId(), user.getEmail(), user.getName(),
         user.getRole(), jwtService.createToken(user));
   }
@@ -49,6 +57,7 @@ public class AuthService {
     if (admin.getPasswordHash() == null || !passwordEncoder.matches(request.password(), admin.getPasswordHash())) {
       throw new ForbiddenException("Incorrect password");
     }
+    emailService.sendSignInNotification(admin.getEmail(), admin.getName());
     var profile = new AuthDtos.UserProfile(admin.getId(), admin.getEmail(), admin.getName(), admin.getRole());
     return new AuthDtos.AdminLoginResponse(jwtService.createToken(admin), admin.getRole(), profile);
   }
