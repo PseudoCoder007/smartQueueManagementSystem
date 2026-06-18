@@ -219,6 +219,8 @@ Transactional email is sent through [Resend](https://resend.com) via `EmailServi
 - **Token created** — sent immediately after a token is generated, confirming the token number, service, queue position, and estimated wait.
 - **Token cancelled** — sent when a user cancels their own waiting token.
 - **Turn reminder** — sent once per token, the moment its estimated wait drops to 5 minutes or less, asking the user to come and take their item or complete billing. A `five_min_reminder_sent_at` timestamp on the `tokens` table (added in `V2__add_token_reminder_sent_at.sql`) guarantees this fires only once per token even though wait time is recalculated repeatedly as the queue moves.
+- **Token skipped** — sent when an admin skips a called/serving token, letting the user know they can try again.
+- **Token completed** — sent when an admin marks a token as completed, thanking the user and inviting them to come back again.
 
 ### Why This Is Used
 

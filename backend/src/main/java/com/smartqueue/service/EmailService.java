@@ -63,6 +63,22 @@ public class EmailService {
         "Join Another Queue", frontendUrl + "/services"));
   }
 
+  public void sendTokenSkipped(String to, String name, String serviceName, int tokenNumber) {
+    sendAsync(to, "Your token was skipped - Smart Queue", wrap("Token skipped",
+        "Hi " + esc(displayName(name)) + ", you weren't available when we called your token <strong>#"
+            + tokenNumber + "</strong> for <strong>" + esc(serviceName) + "</strong>, so it was skipped. "
+            + "No worries — please try again.",
+        "Try Again", frontendUrl + "/services"));
+  }
+
+  public void sendTokenCompleted(String to, String name, String serviceName, int tokenNumber) {
+    sendAsync(to, "You're all done - Smart Queue", wrap("All done!",
+        "Hi " + esc(displayName(name)) + ", your token <strong>#" + tokenNumber + "</strong> for "
+            + "<strong>" + esc(serviceName) + "</strong> has been completed. Thanks for your visit — "
+            + "please come back again!",
+        "Visit Again", frontendUrl + "/services"));
+  }
+
   public void sendSignInNotification(String to, String name) {
     sendAsync(to, "New sign-in to your Smart Queue account", wrap("New sign-in detected",
         "Hi " + esc(displayName(name)) + ", we noticed a new sign-in to your Smart Queue account. "

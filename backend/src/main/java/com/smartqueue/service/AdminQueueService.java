@@ -21,10 +21,11 @@ public class AdminQueueService {
   private final QueueAuditService audit;
   private final QueueMapper mapper;
   private final QueueEventPublisher publisher;
+  private final EmailService emailService;
 
   public AdminQueueService(ServiceQueueService serviceQueues, QueueSessionRepository sessions,
       TokenRepository tokens, TokenService tokenService, QueueAuditService audit,
-      QueueMapper mapper, QueueEventPublisher publisher) {
+      QueueMapper mapper, QueueEventPublisher publisher, EmailService emailService) {
     this.serviceQueues = serviceQueues;
     this.sessions = sessions;
     this.tokens = tokens;
@@ -32,6 +33,7 @@ public class AdminQueueService {
     this.audit = audit;
     this.mapper = mapper;
     this.publisher = publisher;
+    this.emailService = emailService;
   }
 
   @Transactional
@@ -103,6 +105,8 @@ public class AdminQueueService {
     token.setStatus(TokenStatus.COMPLETED);
     token.setCompletedAt(Instant.now());
     tokenService.recalculate(token.getQueueSession());
+    emailService.sendTokenCompleted(token.getUser().getEmail(), token.getUser().getName(),
+        token.getService().getName(), token.getTokenNumber());
     return changed(token, QueueEventType.TOKEN_COMPLETED, actor, "Token completed");
   }
 
@@ -114,6 +118,8 @@ public class AdminQueueService {
     }
     token.setStatus(TokenStatus.SKIPPED);
     tokenService.recalculate(token.getQueueSession());
+    emailService.sendTokenSkipped(token.getUser().getEmail(), token.getUser().getName(),
+        token.getService().getName(), token.getTokenNumber());
     return changed(token, QueueEventType.TOKEN_SKIPPED, actor, "Token skipped");
   }
 
