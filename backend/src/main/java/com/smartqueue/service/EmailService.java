@@ -79,6 +79,22 @@ public class EmailService {
         "Visit Again", frontendUrl + "/services"));
   }
 
+  public void sendTokenRecalled(String to, String name, String serviceName, int tokenNumber) {
+    sendAsync(to, "You've been recalled - Smart Queue", wrap("You're back in line",
+        "Hi " + esc(displayName(name)) + ", your token <strong>#" + tokenNumber + "</strong> for "
+            + "<strong>" + esc(serviceName) + "</strong> has been recalled. Please get in line for "
+            + "your turn — we'll call you again shortly.",
+        "View My Token", frontendUrl + "/my-tokens"));
+  }
+
+  public void sendTokenCalled(String to, String name, String serviceName, int tokenNumber) {
+    sendAsync(to, "You're being called now - Smart Queue", wrap("It's your turn!",
+        "Hi " + esc(displayName(name)) + ", your token <strong>#" + tokenNumber + "</strong> for "
+            + "<strong>" + esc(serviceName) + "</strong> has just been called. Please present yourself "
+            + "at the counter now.",
+        "View My Token", frontendUrl + "/my-tokens"));
+  }
+
   public void sendSignInNotification(String to, String name) {
     sendAsync(to, "New sign-in to your Smart Queue account", wrap("New sign-in detected",
         "Hi " + esc(displayName(name)) + ", we noticed a new sign-in to your Smart Queue account. "

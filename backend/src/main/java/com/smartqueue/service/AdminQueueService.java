@@ -131,6 +131,8 @@ public class AdminQueueService {
     }
     token.setStatus(TokenStatus.WAITING);
     tokenService.recalculate(token.getQueueSession());
+    emailService.sendTokenRecalled(token.getUser().getEmail(), token.getUser().getName(),
+        token.getService().getName(), token.getTokenNumber());
     return changed(token, QueueEventType.TOKEN_RECALLED, actor, "Token recalled");
   }
 
@@ -153,6 +155,8 @@ public class AdminQueueService {
     token.setPositionSnapshot(0);
     token.setEstimatedWaitMinutes(0);
     tokenService.recalculate(token.getQueueSession());
+    emailService.sendTokenCalled(token.getUser().getEmail(), token.getUser().getName(),
+        token.getService().getName(), token.getTokenNumber());
     return changed(token, QueueEventType.TOKEN_CALLED, actor, "Token called");
   }
 
