@@ -200,6 +200,20 @@ label { color: var(--text-muted); display: block; font-size: 12px; font-weight: 
 .auth-footer-link { color: var(--text-muted); font-size: 12px; text-align: center; }
 .auth-footer-link a { color: var(--primary); }
 .password-field { display: grid; gap: 8px; grid-template-columns: 1fr 36px; align-items: end; }
+.auth-link-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  min-height: auto;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+}
+.auth-link-btn:hover { background: none; color: var(--primary); }
+.auth-divider { align-items: center; color: var(--text-muted); display: flex; font-size: 12px; gap: 10px; }
+.auth-divider-line { background: var(--border); flex: 1; height: 1px; }
 
 /* Segmented control */
 .segmented-control, .auth-switch {

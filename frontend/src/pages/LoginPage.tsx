@@ -11,6 +11,17 @@ type LoginMode = 'password' | 'otp';
 type PasswordIntent = 'login' | 'signup';
 const devAuthEnabled = import.meta.env.VITE_DEV_AUTH_ENABLED === 'true';
 
+function GoogleIcon() {
+  return (
+    <svg height="16" viewBox="0 0 48 48" width="16">
+      <path d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v9.02h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.68z" fill="#4285F4" />
+      <path d="M24 46c5.94 0 10.92-1.97 14.56-5.32l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" fill="#34A853" />
+      <path d="M11.69 28.19A13.96 13.96 0 0 1 10.94 24c0-1.45.25-2.86.7-4.19v-5.7H4.34A23.93 23.93 0 0 0 2 24c0 3.87.93 7.53 2.34 10.7l7.35-5.7z" fill="#FBBC05" />
+      <path d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 13.81l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" fill="#EA4335" />
+    </svg>
+  );
+}
+
 function friendlySupabaseError(message: string) {
   if (message.toLowerCase().includes('email rate limit')) return 'Email rate limit reached. Please wait before requesting another login email.';
   if (message.toLowerCase().includes('invalid login credentials')) return 'Invalid email or password.';
@@ -102,6 +113,19 @@ export function LoginPage() {
     toast.success('Check your email for the login link or OTP.');
   }
 
+  async function signInWithGoogle() {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/otp-callback` }
+    });
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+    }
+    // On success the browser navigates to Google, so no further state change here.
+  }
+
   async function submitDevLogin() {
     if (!email) { toast.error('Enter an email first.'); return; }
     setLoading(true);
@@ -142,6 +166,16 @@ export function LoginPage() {
             <div className="auth-panel-sub" style={{ marginTop: 4 }}>{mode === 'otp' ? 'We\'ll email you a magic link' : 'Use your email and password'}</div>
           </div>
 
+          <button className="btn-secondary" disabled={loading} onClick={signInWithGoogle} style={{ alignItems: 'center', display: 'flex', gap: 8, justifyContent: 'center', width: '100%' }} type="button">
+            <GoogleIcon /> Continue with Google
+          </button>
+
+          <div className="auth-divider">
+            <span className="auth-divider-line" />
+            <span>or</span>
+            <span className="auth-divider-line" />
+          </div>
+
           <div className="segmented-control" role="tablist" aria-label="Login method">
             <button aria-selected={mode === 'password'} className={mode === 'password' ? 'active' : ''} onClick={() => setMode('password')} role="tab" type="button">Password</button>
             <button aria-selected={mode === 'otp'} className={mode === 'otp' ? 'active' : ''} onClick={() => setMode('otp')} role="tab" type="button">OTP / Link</button>
@@ -173,14 +207,14 @@ export function LoginPage() {
                 </button>
               </div>
               {passwordIntent === 'login' && (
-                <button className="auth-footer-link" disabled={loading} onClick={submitForgotPassword} style={{ marginTop: 8, padding: 0 }} type="button">
+                <button className="auth-link-btn" disabled={loading} onClick={submitForgotPassword} style={{ marginTop: 8 }} type="button">
                   Forgot password?
                 </button>
               )}
               {showNoAccountHint && (
                 <div className="auth-panel-sub" style={{ marginTop: 8 }}>
                   Don&apos;t have an account yet?{' '}
-                  <button className="auth-footer-link" onClick={() => { setPasswordIntent('signup'); setShowNoAccountHint(false); }} style={{ padding: 0 }} type="button">
+                  <button className="auth-link-btn" onClick={() => { setPasswordIntent('signup'); setShowNoAccountHint(false); }} style={{ display: 'inline' }} type="button">
                     Create one
                   </button>
                 </div>

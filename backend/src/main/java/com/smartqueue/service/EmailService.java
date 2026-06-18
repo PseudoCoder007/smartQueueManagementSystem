@@ -41,6 +41,15 @@ public class EmailService {
         "Your account is ready. Join a queue any time and we'll keep you posted on your position."));
   }
 
+  public void sendTokenCreated(String to, String name, String serviceName, int tokenNumber, int position,
+      int estimatedWaitMinutes) {
+    sendAsync(to, "You're in the queue - Smart Queue", wrap("You're in the queue!",
+        "Hi " + esc(displayName(name)) + ", your token <strong>#" + tokenNumber + "</strong> for "
+            + "<strong>" + esc(serviceName) + "</strong> has been created. You're at position "
+            + position + " with an estimated wait of about " + estimatedWaitMinutes + " minutes. "
+            + "We'll email you again when your turn is close."));
+  }
+
   public void sendSignInNotification(String to, String name) {
     sendAsync(to, "New sign-in to your Smart Queue account", wrap("New sign-in detected",
         "Hi " + esc(displayName(name)) + ", we noticed a new sign-in to your Smart Queue account. "

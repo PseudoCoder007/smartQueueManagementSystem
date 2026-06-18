@@ -74,6 +74,8 @@ public class TokenService {
     tokens.save(token);
     recalculate(session);
     audit.record(token, QueueEventType.TOKEN_CREATED, user, "Token created");
+    emailService.sendTokenCreated(user.getEmail(), user.getName(), service.getName(), token.getTokenNumber(),
+        token.getPositionSnapshot(), token.getEstimatedWaitMinutes());
     TokenDtos.TokenResponse response = mapper.token(token);
     publisher.queueChanged("TOKEN_CREATED", service.getId(), token.getId(), response);
     publisher.userTokenChanged("TOKEN_CREATED", service.getId(), user.getId(), token.getId(), response);
