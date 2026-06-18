@@ -12,19 +12,7 @@ export function OtpCallbackPage() {
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
-    async function sync() {
-      const code = new URLSearchParams(window.location.search).get('code');
-      const result = code
-        ? await supabase.auth.exchangeCodeForSession(code)
-        : await supabase.auth.getSession();
-      const accessToken = result.data.session?.access_token;
-      const sessionError = result.error;
-      if (sessionError || !accessToken) {
-        const message = sessionError?.message ?? 'No Supabase session found.';
-        setError(message);
-        toast.error(message);
-        return;
-      }
+    async function finishLogin(accessToken: string) {
       const response = await api<AuthResponse>('/auth/user/supabase-sync', {
         method: 'POST',
         ...jsonBody({ supabaseAccessToken: accessToken })
@@ -33,6 +21,32 @@ export function OtpCallbackPage() {
       toast.success('Signed in successfully.');
       setCompleted(true);
     }
+
+    async function sync() {
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (code) {
+        const result = await supabase.auth.exchangeCodeForSession(code);
+        const accessToken = result.data.session?.access_token;
+        if (result.error || !accessToken) {
+          throw new Error(result.error?.message ?? 'Login link is invalid or has expired.');
+        }
+        await finishLogin(accessToken);
+        return;
+      }
+      // Implicit-flow links carry the session in the URL hash, which the
+      // Supabase client parses asynchronously on load — a single getSession()
+      // call here can race that parsing, so poll briefly instead.
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.access_token) {
+          await finishLogin(data.session.access_token);
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      throw new Error('No Supabase session found. The link may have expired — request a new one.');
+    }
+
     void sync().catch(err => {
       const message = err instanceof Error ? err.message : 'Login failed';
       setError(message);

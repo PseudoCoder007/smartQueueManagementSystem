@@ -8,6 +8,7 @@ import { AdminStatsPage } from '../pages/AdminStatsPage';
 import { LoginPage } from '../pages/LoginPage';
 import { MyTokensPage } from '../pages/MyTokensPage';
 import { OtpCallbackPage } from '../pages/OtpCallbackPage';
+import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 import { ServiceDetailPage } from '../pages/ServiceDetailPage';
 import { ServicesPage } from '../pages/ServicesPage';
 import { TokenTrackingPage } from '../pages/TokenTrackingPage';
@@ -20,6 +21,7 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/otp-callback" element={<OtpCallbackPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route element={<ProtectedRoute role="USER" />}>
         <Route element={<AppLayout />}>

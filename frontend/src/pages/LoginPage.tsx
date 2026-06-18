@@ -26,6 +26,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showNoAccountHint, setShowNoAccountHint] = useState(false);
 
   async function syncAppSession(accessToken: string) {
     const response = await api<AuthResponse>('/auth/user/supabase-sync', {
@@ -38,6 +39,7 @@ export function LoginPage() {
   async function submitPassword(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
+    setShowNoAccountHint(false);
     try {
       if (passwordIntent === 'signup') {
         const { data, error } = await supabase.auth.signUp({
@@ -62,7 +64,27 @@ export function LoginPage() {
       toast.success('Signed in successfully.');
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      toast.error(friendlySupabaseError(err instanceof Error ? err.message : 'Login failed'));
+      const message = err instanceof Error ? err.message : 'Login failed';
+      toast.error(friendlySupabaseError(message));
+      if (passwordIntent === 'login' && message.toLowerCase().includes('invalid login credentials')) {
+        setShowNoAccountHint(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitForgotPassword() {
+    if (!email) { toast.error('Enter your email first.'); return; }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      if (error) throw error;
+      toast.success('Check your email for a password reset link.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not send reset email.');
     } finally {
       setLoading(false);
     }
@@ -127,8 +149,8 @@ export function LoginPage() {
 
           {mode === 'password' && (
             <div className="auth-switch">
-              <button className={passwordIntent === 'login' ? 'active' : ''} onClick={() => setPasswordIntent('login')} type="button">Sign in</button>
-              <button className={passwordIntent === 'signup' ? 'active' : ''} onClick={() => setPasswordIntent('signup')} type="button">Create account</button>
+              <button className={passwordIntent === 'login' ? 'active' : ''} onClick={() => { setPasswordIntent('login'); setShowNoAccountHint(false); }} type="button">Sign in</button>
+              <button className={passwordIntent === 'signup' ? 'active' : ''} onClick={() => { setPasswordIntent('signup'); setShowNoAccountHint(false); }} type="button">Create account</button>
             </div>
           )}
 
@@ -150,6 +172,19 @@ export function LoginPage() {
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
+              {passwordIntent === 'login' && (
+                <button className="auth-footer-link" disabled={loading} onClick={submitForgotPassword} style={{ marginTop: 8, padding: 0 }} type="button">
+                  Forgot password?
+                </button>
+              )}
+              {showNoAccountHint && (
+                <div className="auth-panel-sub" style={{ marginTop: 8 }}>
+                  Don&apos;t have an account yet?{' '}
+                  <button className="auth-footer-link" onClick={() => { setPasswordIntent('signup'); setShowNoAccountHint(false); }} style={{ padding: 0 }} type="button">
+                    Create one
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
