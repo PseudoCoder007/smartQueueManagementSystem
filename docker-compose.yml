@@ -1,0 +1,41 @@
+services:
+  backend:
+    image: ghcr.io/${GHCR_OWNER}/smartqueue-backend:latest
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  frontend-assets:
+    image: ghcr.io/${GHCR_OWNER}/smartqueue-frontend:latest
+    restart: "no"
+    volumes:
+      - frontend_dist:/dist_target
+    entrypoint: ["sh", "-c", "rm -rf /dist_target/* && cp -r /dist/* /dist_target/"]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend-assets:
+        condition: service_completed_successfully
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - frontend_dist:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  frontend_dist:
+  caddy_data:
+  caddy_config:
