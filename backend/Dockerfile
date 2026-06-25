@@ -17,8 +17,9 @@ RUN chown -R spring:spring /app
 USER spring
 EXPOSE 8080
 
-# Sized for a 1GB-RAM box shared with Caddy + the OS.
-ENV JAVA_OPTS="-Xms192m -Xmx320m -XX:MaxMetaspaceSize=96m -XX:+UseSerialGC"
+# Sized for a 1GB-RAM box shared with Caddy + the OS - same values already
+# proven under real traffic on Railway (96m metaspace was not enough).
+ENV JAVA_OPTS="-Xmx256m -Xss256k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=64m -XX:+UseSerialGC"
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=5 \
     CMD wget -qO- http://localhost:8080/actuator/health || exit 1

@@ -3,6 +3,8 @@ services:
     image: ghcr.io/${GHCR_OWNER}/smartqueue-backend:latest
     restart: unless-stopped
     env_file: .env
+    environment:
+      JAVA_OPTS: "-Xmx256m -Xss256k -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=64m -XX:+UseSerialGC"
     expose:
       - "8080"
     healthcheck:
