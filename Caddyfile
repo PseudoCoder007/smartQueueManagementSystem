@@ -2,7 +2,7 @@
     email zelero.tech@gmail.com
 }
 
-smart-queue.in, www.smart-queue.in {
+postmanchat.live, www.postmanchat.live, smart-queue.in, www.smart-queue.in {
     encode zstd gzip
 
     handle /api/* {
